@@ -11,7 +11,7 @@ Table of contents:
 `integration_test` (bundled with the Flutter SDK, successor to the older
 `flutter_driver`) runs the full app end-to-end on a real device or
 emulator. There is no separate "E2E tool" the way web has Playwright or
-Cypress as a distinct category — `integration_test`, together with Patrol
+Cypress as a distinct category. `integration_test`, together with Patrol
 where needed, fills that role for Flutter. This is the slowest, most
 expensive layer, and by design should have the fewest tests.
 
@@ -39,9 +39,9 @@ void main() {
 }
 ```
 
-Run with `flutter test integration_test/` (only when the user has opted
-into running/verifying tests — see Step 7 of SKILL.md) — this launches a
-real app instance, unlike widget tests which never leave the simulated
+Run with `flutter test integration_test/`, only when the user has opted
+into running/verifying tests (see Step 7 of SKILL.md). This launches a
+real app instance, unlike widget tests, which never leave the simulated
 test environment.
 
 ## When Patrol is needed
@@ -52,14 +52,15 @@ payment sheets, notification interaction. The community package `patrol`
 layers on top of `integration_test` specifically to handle these. Only
 introduce it if the flow under test genuinely needs one of these
 native-level interactions, or if the project already depends on it (check
-`scripts/detect_stack.sh`'s output) — don't add it as a default dependency
+`scripts/detect_stack.sh`'s output). Don't add it as a default dependency
 for an ordinary in-app flow that plain `integration_test` already covers.
 
 ## Scope: reserve for critical flows
 
 Reserve integration tests for revenue-critical or otherwise
 irreversible-if-broken flows: login, checkout/payment, onboarding. This is
-the most expensive layer by a wide margin — smallest test count by design.
+the most expensive layer by a wide margin, so it gets the smallest test
+count by design.
 See [reference/ci-and-distribution.md](ci-and-distribution.md) for the
 recommended proportion relative to unit/widget/golden tests, and for why
 these specifically warrant macOS CI runners (for iOS) while every other

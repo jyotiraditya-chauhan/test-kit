@@ -33,14 +33,14 @@ testWidgets('PrimaryButton matches golden', (tester) async {
 
 ## Flakiness causes and fixes
 
-- **Font rendering differences across machines/CI runners** — bundle fonts
+- **Font rendering differences across machines/CI runners.** Bundle fonts
   explicitly into the test environment rather than relying on host defaults.
-- **Device-pixel-ratio differences** — pin DPR explicitly in the test:
+- **Device-pixel-ratio differences.** Pin DPR explicitly in the test:
   ```dart
   tester.view.devicePixelRatio = 1.0;
   addTearDown(tester.view.resetDevicePixelRatio);
   ```
-- **Unpinned locale/timezone in the widget under test** — set explicit
+- **Unpinned locale/timezone in the widget under test.** Set explicit
   locale/`Directionality` in the pumped widget tree rather than relying on
   ambient defaults, if the widget's appearance depends on either.
 
@@ -53,5 +53,5 @@ flutter test --update-goldens
 ```
 
 Never run this to silence a failing golden without first confirming the
-visual change was intentional — an unreviewed `--update-goldens` defeats the
+visual change was intentional. An unreviewed `--update-goldens` defeats the
 entire point of the test.

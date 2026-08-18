@@ -12,7 +12,7 @@ third-party commentary: **Vitest currently cannot render an async Server
 Component.** A synchronous Server Component renders fine under
 `@testing-library/react` inside Vitest. The moment a component body contains
 `const data = await fetch(...)` (or any other await), rendering it under
-Vitest throws. This is a genuine capability gap, not a config problem —
+Vitest throws. This is a genuine capability gap, not a config problem.
 React's Server Component runtime expects an async execution environment
 Vitest's test runner does not currently provide. Workarounds (manually
 awaiting the async component function, shimming React's internal async
@@ -23,7 +23,7 @@ propose them as a real fix.
 
 Pull the async data-fetching call OUT of the component body and into a
 plain, separately-importable async function. Unit-test that function
-directly with Vitest — no rendering involved at all, it's just an async
+directly with Vitest. No rendering is involved at all, it's just an async
 function you call and assert on. This sidesteps the capability gap entirely
 and is a better architectural pattern regardless (separates data-fetching
 from rendering concerns).
@@ -50,7 +50,7 @@ export default async function UserPage({ params }: { params: { id: string } }) {
 
 If the project has NOT already extracted data-fetching this way, propose the
 extraction as part of the test plan (Step 4 of SKILL.md) rather than trying
-to test the async component body directly under Vitest — state clearly why.
+to test the async component body directly under Vitest, and state clearly why.
 
 ## The Vitest / Playwright split
 

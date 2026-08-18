@@ -12,43 +12,44 @@ automatic.
 
 | Skill | Namespaced as | Covers |
 |---|---|---|
-| `flutter-testing` | `/testing-suite:flutter-testing` | Flutter unit, widget, golden, and integration tests — each a first-class layer with its own reference doc. Detects BLoC/Riverpod/Provider/GetX from `pubspec.yaml` and selects the matching harness pattern. |
+| `flutter-testing` | `/testing-suite:flutter-testing` | Flutter unit, widget, golden, and integration tests, each a first-class layer with its own reference doc. Detects BLoC/Riverpod/Provider/GetX from `pubspec.yaml` and selects the matching harness pattern. |
 | `react-testing` | `/testing-suite:react-testing` | Plain React (Vite/CRA, non-Next) unit and component/integration tests with Vitest/Jest, React Testing Library, and MSW for network-boundary mocking. |
-| `nextjs-testing` | `/testing-suite:nextjs-testing` | Next.js (App Router or Pages Router) tests, split between Vitest (Server Actions, schema validation, sync components) and Playwright (async Server Components, auth, checkout — the layer Vitest structurally cannot render). |
+| `nextjs-testing` | `/testing-suite:nextjs-testing` | Next.js (App Router or Pages Router) tests, split between Vitest (Server Actions, schema validation, sync components) and Playwright (async Server Components, auth, checkout, the layer Vitest structurally cannot render). |
 | `swift-testing` | `/testing-suite:swift-testing` | Swift/SwiftUI unit, view-model, and snapshot tests. Defaults to Swift Testing (`@Test`/`#expect`), keeps XCTest where it already exists, and tests the view model directly since SwiftUI has no public view-tree introspection. |
-| `node-testing` | `/testing-suite:node-testing` | Node backend APIs (Express/Fastify/Koa/NestJS) — unit tests for pure logic, Supertest-based HTTP integration tests against the app instance directly, and testcontainers-backed tests for real database behavior. |
+| `node-testing` | `/testing-suite:node-testing` | Node backend APIs (Express/Fastify/Koa/NestJS): unit tests for pure logic, Supertest-based HTTP integration tests against the app instance directly, and testcontainers-backed tests for real database behavior. |
 
 Each skill's description leads with concrete trigger terms (framework
-names, manifest files, library names) specific to that platform, and each
-skill's `scripts/detect_stack.sh` explicitly declines and points to the
-correct sibling skill when it detects the wrong stack (e.g. `react-testing`
-refuses a project with `next` in `package.json`).
+names, manifest files, library names) specific to that platform. Each
+skill's `scripts/detect_stack.sh` also explicitly declines and points to
+the correct sibling skill when it detects the wrong stack. `react-testing`,
+for example, refuses a project with `next` in `package.json`.
 
 ## What every skill does, in order
 
-1. **Detect the stack** — run `scripts/detect_stack.sh`, which fingerprints
-   the project's manifest/source files for the framework, state-management
-   library, existing test runner, and mocking/snapshot tooling already in
-   use. An existing convention always wins over the skill's own default.
-2. **Audit project structure** — classify the target code (pure logic vs
-   UI vs data-access), match existing naming conventions, and flag
+1. **Detect the stack.** Run `scripts/detect_stack.sh`, which fingerprints
+   the project's manifest and source files for the framework,
+   state-management library, existing test runner, and mocking/snapshot
+   tooling already in use. An existing convention always wins over the
+   skill's own default.
+2. **Audit project structure.** Classify the target code as pure logic,
+   UI, or data-access, match existing naming conventions, and flag
    critical paths (auth, payment, data-writes) for elevated rigor.
-3. **Ask what to test** — a single message asking both the test layer
-   (unit/widget/integration/etc.) and the scope (whole app, one feature, or
-   specific files) before generating anything. This is never assumed.
-4. **State the plan** — what's in scope, what's mocked vs real, and the
+3. **Ask what to test.** One message, asking both the test layer
+   (unit/widget/integration/etc.) and the scope (whole app, one feature,
+   or specific files) before generating anything. This is never assumed.
+4. **State the plan.** What's in scope, what's mocked vs real, and the
    specific edge cases planned, before any test code is written.
-5. **Generate** — AAA-structured tests, boundary-only mocking/faking,
+5. **Generate.** AAA-structured tests, boundary-only mocking or faking,
    matching the project's existing style, with minimal comments.
-6. **Report, then offer** — list what was written and what each test
+6. **Report, then offer.** List what was written and what each test
    covers. Nothing is run yet, and nothing is claimed to pass or fail.
-   Offer to run and verify — don't do it unprompted.
-7. **Only if asked** — run the new tests, then run the mandatory
-   fault-injection self-check on business-logic/critical-path tests:
-   deliberately break the implementation, confirm the test goes red, revert
-   the break, and report honestly what was covered, what was left out, and
-   whether any test was flagged and rewritten. Never a blanket "fully
-   tested" claim.
+   Offer to run and verify, don't do it unprompted.
+7. **Only if asked, run and verify.** Run the new tests, then run the
+   mandatory fault-injection self-check on business-logic and
+   critical-path tests: deliberately break the implementation, confirm
+   the test goes red, revert the break, and report honestly what was
+   covered, what was left out, and whether any test was flagged and
+   rewritten. Never a blanket "fully tested" claim.
 
 ## Install
 
@@ -76,22 +77,22 @@ claude plugin validate ./plugins/testing-suite
 
 ## Flutter goes deeper than the rest
 
-`flutter-testing` has a dedicated reference doc per layer — unit, widget,
-golden, and integration — plus cross-cutting docs for state management,
-Firebase fakes, and CI/distribution shape, and a second script
-(`scaffold_test_file.sh`) for mirroring `lib/` into `test/`. See the root
-README's [Flutter, in depth](../../README.md#flutter-in-depth) section for
-the full breakdown.
+`flutter-testing` has a dedicated reference doc for each layer (unit,
+widget, golden, and integration), plus cross-cutting docs for state
+management, Firebase fakes, and CI/distribution shape, and a second
+script (`scaffold_test_file.sh`) for mirroring `lib/` into `test/`. See
+the root README's [Flutter, in depth](../../README.md#flutter-in-depth)
+section for the full breakdown.
 
 ## Why "ask, don't assume" and fault-injection matter
 
-Left unconstrained, an AI agent tends to write tests that confirm what its
-own implementation already does rather than what it should do — a suite
-that can hit 100% coverage while asserting nothing. See the root
-[README's "Why this exists"](../../README.md#why-this-exists) section for
-the research this guards against and a live, end-to-end proof that the
+Left unconstrained, an AI agent tends to write tests that confirm what
+its own implementation already does, rather than what it should do. That
+kind of suite can hit 100% coverage while asserting nothing. See the root
+README's [Why this exists](../../README.md#why-this-exists) section for
+the research behind that concern, and a live, end-to-end proof that the
 fault-injection self-check actually catches it.
 
 ## License
 
-MIT — see [LICENSE](../../LICENSE) in the repository root.
+MIT. See [LICENSE](../../LICENSE) in the repository root.

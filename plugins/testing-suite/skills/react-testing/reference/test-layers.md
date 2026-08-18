@@ -17,14 +17,14 @@ resembling how the software is actually used.
 
 ## Concrete definitions for React
 
-- **Unit test**: a pure function — a pricing calculator, a formatter, a
-  reducer — tested with no rendering at all.
+- **Unit test**: a pure function, such as a pricing calculator, a
+  formatter, or a reducer, tested with no rendering at all.
 - **Component test**: a rendered component (`<PriceDisplay />`) verified for
   correct rendering and response to prop changes/interaction, via Vitest/
   Jest + RTL (jsdom).
 - **Integration test** (trophy sense): a component or small tree exercised
   together with real state management and MSW-mocked network, verifying an
-  actual user flow within the page — the default unit of testing for
+  actual user flow within the page. This is the default unit of testing for
   anything that fetches, renders conditionally, or writes back to a store.
 
 ## Recommended distribution
@@ -33,7 +33,7 @@ Trophy shape: a static-analysis base, a fat integration-test middle
 (component tests exercising real state + MSW-mocked network), a thin unit
 layer for pure logic only, a thin E2E cap. For a substantial product,
 sources commonly cite roughly 20-30 E2E tests as the working range for
-critical journeys — not more. See
+critical journeys, not more. See
 [e2e-and-antipatterns.md](e2e-and-antipatterns.md) for why an inverted
 pyramid (large E2E suite, thin integration layer) is an expensive mistake.
 
@@ -46,6 +46,6 @@ unreviewed lines, and developers get in the habit of blindly
 `--update-snapshot` rather than reading the diff. Use snapshots narrowly,
 for small and structurally simple output only. For visual verification at
 scale, prefer Storybook + Chromatic (purpose-built visual regression
-tooling) over repurposed unit-test snapshots — but only introduce that if
-the project already uses it or the user asks; it's a separate tool, not a
-default addition.
+tooling) over repurposed unit-test snapshots. Only introduce that if
+the project already uses it or the user asks, since it's a separate tool,
+not a default addition.

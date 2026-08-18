@@ -24,7 +24,7 @@ afterAll(async () => container.stop());
 ```
 
 Most teams over-invest effort in the E2E layer and under-invest in this
-specific testcontainers-backed integration layer — actively recommend it
+specific testcontainers-backed integration layer. Actively recommend it
 for anything genuinely database-behavior-dependent (a real query, a real
 index constraint, a real migration), rather than defaulting to either
 "fake everything" or reaching for full E2E.
@@ -37,17 +37,17 @@ full consumer: Pact (consumer-driven contracts, with a Pact Broker for
 sharing contracts between teams/repos) or direct OpenAPI-spec validation
 (tools like Dredd) that assert real responses conform to a published
 schema. Only propose this if the project already has cross-repo/external
-consumers, or the user explicitly asks — it's a separate concern from
+consumers, or the user explicitly asks. It's a separate concern from
 ordinary route testing, not a default addition to every test plan.
 
 ## Coverage targets
 
 Target roughly 70-80% line coverage with deliberately HIGH branch coverage
-specifically on the highest-risk paths — authentication, billing/payment,
+specifically on the highest-risk paths: authentication, billing/payment,
 and any data-write path. Pushing coverage past ~90% on a whole codebase has
 steeply diminishing returns and often means testing trivial getters/setters
 instead of directing effort at meaningful integration tests on paths that
 actually matter. Coverage percentage is not a substitute for the
-fault-injection self-check in [verification.md](verification.md) — a test
+fault-injection self-check in [verification.md](verification.md). A test
 suite can hit these coverage numbers while still asserting nothing
 meaningful.

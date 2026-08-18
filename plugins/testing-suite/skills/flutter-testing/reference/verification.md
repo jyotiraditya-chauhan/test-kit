@@ -1,7 +1,7 @@
 # Fault-Injection Self-Check
 
 Run this procedure only when the user has asked you to run or verify the
-tests (SKILL.md Step 7) — it is never triggered automatically just because
+tests (SKILL.md Step 7). It is never triggered automatically just because
 tests were generated. Once triggered, it is a mandatory, low-freedom
 procedure: follow it exactly, in this order, for every business-logic or
 critical-path test (auth, payment, any data-write path) in scope. Do not
@@ -16,8 +16,8 @@ catches that failure mode in seconds, with no extra tooling.
 ## Procedure
 
 1. Run the new test against the real, unmodified implementation. Confirm it
-   is GREEN. If it is red against correct code, the test itself is wrong —
-   fix the test now, do not touch the implementation to satisfy a bad test.
+   is GREEN. If it is red against correct code, the test itself is wrong.
+   Fix the test now, do not touch the implementation to satisfy a bad test.
 
 2. Open the implementation file the test targets. Introduce exactly ONE
    small, obvious fault, chosen from this list, in the specific line(s) the
@@ -28,7 +28,7 @@ catches that failure mode in seconds, with no extra tooling.
    - Skip an early-return/guard branch (comment it out or invert its
      condition).
 
-3. Re-run the exact same new test (not the whole suite — just this test, to
+3. Re-run the exact same new test (not the whole suite, just this test, to
    keep the loop fast).
 
 4. Confirm it now FAILS (goes RED). This is the required outcome.
@@ -39,7 +39,7 @@ catches that failure mode in seconds, with no extra tooling.
      completed without throwing, and restart this procedure from step 1
      for the rewritten test.
 
-5. Revert the deliberate fault immediately — restore the implementation file
+5. Revert the deliberate fault immediately. Restore the implementation file
    to its exact original state. Re-run the test once more to confirm it is
    GREEN again against the real, correct implementation.
 
@@ -59,5 +59,5 @@ catches that failure mode in seconds, with no extra tooling.
   code gets rewritten, not accepted.
 - Once verification has been triggered, apply this to business-logic and
   critical-path tests always. For pure UI-rendering assertions (e.g. "this
-  text is present"), it is optional within that pass — note in the report
+  text is present"), it is optional within that pass. Note in the report
   if it was skipped and why.

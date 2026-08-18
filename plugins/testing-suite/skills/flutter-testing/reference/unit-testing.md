@@ -8,7 +8,7 @@ Table of contents:
 
 ## Scope
 
-Pure Dart logic — services, repositories, use-cases, formatters, view-model
+Pure Dart logic: services, repositories, use-cases, formatters, view-model
 logic that doesn't touch the widget tree. No Flutter framework dependency
 required; these are plain `package:test` tests and the fastest, cheapest
 layer. If the code under test imports `package:flutter/material.dart` only
@@ -58,7 +58,7 @@ void main() {
 
 ## Mocking a dependency
 
-Use `mocktail` (or the project's existing mocking library — see Step 1 of
+Use `mocktail` (or the project's existing mocking library, see Step 1 of
 SKILL.md) only when the unit under test has a real dependency to isolate,
 never for a class with no external collaborators:
 

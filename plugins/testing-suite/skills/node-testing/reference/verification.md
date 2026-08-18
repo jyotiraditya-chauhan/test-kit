@@ -1,7 +1,7 @@
 # Fault-Injection Self-Check
 
 Run this procedure only when the user has asked you to run or verify the
-tests (SKILL.md Step 7) — it is never triggered automatically just because
+tests (SKILL.md Step 7). It is never triggered automatically just because
 tests were generated. Once triggered, it is a mandatory, low-freedom
 procedure: follow it exactly, in this order, for every business-logic or
 critical-path test (auth, payment, any data-write path) in scope. Do not
@@ -16,8 +16,8 @@ catches that failure mode in seconds, with no extra tooling.
 ## Procedure
 
 1. Run the new test against the real, unmodified implementation. Confirm it
-   is GREEN. If it is red against correct code, the test itself is wrong —
-   fix the test now, do not touch the implementation to satisfy a bad test.
+   is GREEN. If it is red against correct code, the test itself is wrong.
+   Fix the test now, do not touch the implementation to satisfy a bad test.
 
 2. Open the implementation file (route handler, middleware, or service) the
    test targets. Introduce exactly ONE small, obvious fault, chosen from
@@ -26,9 +26,9 @@ catches that failure mode in seconds, with no extra tooling.
    - Change a returned literal, status code, or default value (`200` to
      `201`, `return true;` to `return false;`).
    - Skip an early-return/guard branch (comment it out or invert its
-     condition) — e.g. an auth check or a validation early-return.
+     condition), e.g. an auth check or a validation early-return.
 
-3. Re-run the exact same new test (not the whole suite — just this test):
+3. Re-run the exact same new test (not the whole suite, just this test):
    `vitest run <path> -t "<test name>"` or the project's Jest equivalent.
 
 4. Confirm it now FAILS (goes RED). This is the required outcome.
@@ -38,7 +38,7 @@ catches that failure mode in seconds, with no extra tooling.
      assertion to check the actual value/status/behavior, and restart this
      procedure from step 1 for the rewritten test.
 
-5. Revert the deliberate fault immediately — restore the implementation
+5. Revert the deliberate fault immediately. Restore the implementation
    file to its exact original state. Re-run the test once more to confirm
    it is GREEN again against the real, correct implementation.
 
@@ -57,5 +57,5 @@ catches that failure mode in seconds, with no extra tooling.
   code gets rewritten, not accepted.
 - Apply this to route handlers, middleware, and service-layer logic on
   critical paths always. For trivial pass-through routes with no branching
-  logic, it is optional — note in the final report if it was skipped and
+  logic, it is optional. Note in the final report if it was skipped and
   why.

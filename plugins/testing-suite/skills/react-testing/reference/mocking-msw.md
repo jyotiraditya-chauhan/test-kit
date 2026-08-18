@@ -10,8 +10,8 @@ Table of contents:
 Mock Service Worker (MSW) intercepts HTTP requests at the network boundary
 (a Node request interceptor in tests) rather than mocking `fetch`/`axios` at
 the module level. This means the component under test is exercised through
-its real data-fetching code path — the same handlers work in tests, local
-dev, and Storybook. This is the concrete implementation of "mock at the true
+its real data-fetching code path, and the same handlers work in tests,
+local dev, and Storybook. This is the concrete implementation of "mock at the true
 I/O boundary, not the function," and is the default mocking approach for
 this skill.
 
@@ -48,5 +48,5 @@ test('shows an error message when the fetch fails', async () => {
 
 Mocking the database, the API, the auth layer, AND the cache all in one test
 reduces the test to "asserting that my mocks return what I told them to
-return" — meaningless. Mock only the network boundary with MSW; let
-everything else in the component (state, effects, rendering) run for real.
+return." That's meaningless. Mock only the network boundary with MSW, and
+let everything else in the component (state, effects, rendering) run for real.

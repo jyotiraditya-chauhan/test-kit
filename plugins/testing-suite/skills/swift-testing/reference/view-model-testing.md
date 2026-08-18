@@ -8,7 +8,7 @@ Table of contents:
 
 ## The core problem
 
-SwiftUI, by design, does not expose its view tree publicly — there is no
+SwiftUI, by design, does not expose its view tree publicly. There is no
 built-in API to walk into a `some View` and inspect its children, text
 content, or modifiers the way you can inspect a rendered DOM in React or a
 widget tree in Flutter. This is why SwiftUI testing looks structurally
@@ -18,8 +18,8 @@ different from the other platforms this plugin covers.
 
 In a well-architected SwiftUI app (MVVM), the `ObservableObject`/
 `@Observable` view model holds essentially all the logic and state that
-drives what the view renders. Thoroughly unit-testing the view model — with
-plain Swift Testing `@Test` functions, no rendering involved at all —
+drives what the view renders. Thoroughly unit-testing the view model, with
+plain Swift Testing `@Test` functions and no rendering involved at all,
 implicitly verifies the overwhelming majority of the view's actual
 behavior, at unit-test speed, with none of SwiftUI's introspection
 limitations. This is the same "extract and test the plain logic" pattern

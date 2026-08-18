@@ -9,7 +9,7 @@ Table of contents:
 ## Which to use
 
 Default to Swift Testing (`@Test`, `#expect`/`#require`) for new test code.
-XCTest remains correct for existing test files — no forced migration. If
+XCTest remains correct for existing test files, and no forced migration. If
 `scripts/detect_stack.sh` reports an existing framework already dominates a
 target, match it rather than introducing the other.
 
@@ -43,7 +43,7 @@ XCUITest) or performance testing (`XCTMetric`). Both remain XCTest-only. A
 realistic modern iOS project uses both side by side: Swift Testing for
 unit/integration/async/parameterized tests, XCTest specifically for
 UI-automation and performance targets. Do not attempt to write a `@Test`
-function that drives `XCUIApplication` — route that to an XCTest UI test
+function that drives `XCUIApplication`. Route that to an XCTest UI test
 target instead.
 
 ## Keep them in separate files

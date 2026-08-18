@@ -53,7 +53,7 @@ Combine `fake_cloud_firestore` with `firebase_auth_mocks` to verify a given
 user, per the project's actual deployed security rules string, is or isn't
 allowed to read/write a given document. Only attempt this if the project
 already has a rules-testing convention in place, or the user explicitly asks
-for it in the elicitation step — it's an integration-level concern, not a
+for it in the elicitation step. It's an integration-level concern, not a
 default for every Firestore-touching unit test.
 
 ## When to use the real emulator instead
@@ -62,5 +62,5 @@ Fakes are for unit/widget-level speed. The Firebase Local Emulator Suite
 (`firebase emulators:start`) runs real Firestore/Auth/Functions logic
 locally and catches things fakes structurally can't, such as real Firestore
 query index requirements. Reserve it for a small set of true integration
-tests, not the default for every test — same principle as
+tests, not the default for every test. It's the same principle as
 `golden-tests.md`'s guidance to keep the expensive layer small.

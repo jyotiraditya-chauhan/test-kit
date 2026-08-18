@@ -24,11 +24,12 @@ import SnapshotTesting
 
 `UIHostingController` wraps the SwiftUI view to produce a snapshot-able
 image. Failures show baseline, current, and diff images as Xcode test
-attachments. It's device-agnostic — render and snapshot for a specific
-device size/trait collection from one simulator, without a device farm, and
-it supports overriding environment values to snapshot the SAME view across
-dark mode, accessibility text sizes, and locale/RTL variants from one test —
-genuinely useful for catching layout breakage across accessibility settings.
+attachments. It's device-agnostic: render and snapshot for a specific
+device size/trait collection from one simulator, without a device farm.
+It also supports overriding environment values to snapshot the SAME view
+across dark mode, accessibility text sizes, and locale/RTL variants from
+one test, which is genuinely useful for catching layout breakage across
+accessibility settings.
 
 ## Scope and flakiness
 
@@ -44,7 +45,7 @@ version in CI, not "whatever's installed."
 
 For any test touching persistence, configure an in-memory persistent
 store/container scoped specifically to the test target rather than the real
-on-disk store — the same "fake, not mock, fast, isolated" property as
+on-disk store. It's the same "fake, not mock, fast, isolated" property as
 `fake_cloud_firestore` in Flutter:
 
 ```swift

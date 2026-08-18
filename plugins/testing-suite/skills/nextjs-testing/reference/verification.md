@@ -1,10 +1,10 @@
 # Fault-Injection Self-Check
 
 Run this procedure only when the user has asked you to run or verify the
-tests (SKILL.md Step 7) — it is never triggered automatically just because
+tests (SKILL.md Step 7). It is never triggered automatically just because
 tests were generated. Once triggered, it is a mandatory, low-freedom
 procedure: follow it exactly, in this order, for every business-logic or
-critical-path test (auth, payment, any data-write path — including Server
+critical-path test (auth, payment, any data-write path, including Server
 Actions and API route handlers) in scope. Do not skip steps, do not
 substitute your own variation, do not summarize it away.
 
@@ -18,7 +18,7 @@ catches that failure mode in seconds, with no extra tooling.
 
 1. Run the new test against the real, unmodified implementation (the
    extracted function, Server Action, or route handler). Confirm it is
-   GREEN. If it is red against correct code, the test itself is wrong — fix
+   GREEN. If it is red against correct code, the test itself is wrong. Fix
    the test now, do not touch the implementation to satisfy a bad test.
 
 2. Open the implementation file the test targets. Introduce exactly ONE
@@ -28,9 +28,9 @@ catches that failure mode in seconds, with no extra tooling.
    - Change a returned literal, status code, or default value (`200` to
      `201`, `return true;` to `return false;`).
    - Skip an early-return/guard branch (comment it out or invert its
-     condition) — e.g. a Zod validation early-return, or an auth check.
+     condition), e.g. a Zod validation early-return, or an auth check.
 
-3. Re-run the exact same new test (not the whole suite — just this test):
+3. Re-run the exact same new test (not the whole suite, just this test):
    `vitest run <path> -t "<test name>"`.
 
 4. Confirm it now FAILS (goes RED). This is the required outcome.
@@ -40,7 +40,7 @@ catches that failure mode in seconds, with no extra tooling.
      assertion to check the actual value/status/behavior, and restart this
      procedure from step 1 for the rewritten test.
 
-5. Revert the deliberate fault immediately — restore the implementation
+5. Revert the deliberate fault immediately. Restore the implementation
    file to its exact original state. Re-run the test once more to confirm
    it is GREEN again against the real, correct implementation.
 
@@ -59,5 +59,5 @@ catches that failure mode in seconds, with no extra tooling.
   code gets rewritten, not accepted.
 - Apply this to Server Actions, route handlers, and any extracted
   business-logic function always. For pure rendering assertions with no
-  logic branch involved, it is optional — note in the final report if it
+  logic branch involved, it is optional. Note in the final report if it
   was skipped and why.

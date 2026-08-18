@@ -1,7 +1,7 @@
 # Fault-Injection Self-Check
 
 Run this procedure only when the user has asked you to run or verify the
-tests (SKILL.md Step 7) — it is never triggered automatically just because
+tests (SKILL.md Step 7). It is never triggered automatically just because
 tests were generated. Once triggered, it is a mandatory, low-freedom
 procedure: follow it exactly, in this order, for every business-logic or
 critical-path test (auth, payment, any data-write path) in scope. Do not
@@ -16,8 +16,8 @@ catches that failure mode in seconds, with no extra tooling.
 ## Procedure
 
 1. Run the new test against the real, unmodified implementation. Confirm it
-   is GREEN. If it is red against correct code, the test itself is wrong —
-   fix the test now, do not touch the implementation to satisfy a bad test.
+   is GREEN. If it is red against correct code, the test itself is wrong.
+   Fix the test now, do not touch the implementation to satisfy a bad test.
 
 2. Open the implementation file (or extracted function) the test targets.
    Introduce exactly ONE small, obvious fault, chosen from this list, in
@@ -28,7 +28,7 @@ catches that failure mode in seconds, with no extra tooling.
    - Skip an early-return/guard branch (comment it out or invert its
      condition).
 
-3. Re-run the exact same new test (not the whole suite — just this test, to
+3. Re-run the exact same new test (not the whole suite, just this test, to
    keep the loop fast): `vitest run <path> -t "<test name>"` or the
    project's Jest equivalent.
 
@@ -36,11 +36,11 @@ catches that failure mode in seconds, with no extra tooling.
    - If it fails: the test is verifying real behavior. Proceed to step 5.
    - If it still PASSES against the deliberately broken code: the test is
      flagged as weak. Do not count it as passing coverage. Rewrite the
-     assertion to check the actual value/behavior — not just that a call
-     completed or a component rendered without throwing — and restart this
+     assertion to check the actual value/behavior, not just that a call
+     completed or a component rendered without throwing, and restart this
      procedure from step 1 for the rewritten test.
 
-5. Revert the deliberate fault immediately — restore the implementation
+5. Revert the deliberate fault immediately. Restore the implementation
    file to its exact original state. Re-run the test once more to confirm
    it is GREEN again against the real, correct implementation.
 
@@ -58,5 +58,5 @@ catches that failure mode in seconds, with no extra tooling.
   correct code gets fixed, not removed. A test that passes against broken
   code gets rewritten, not accepted.
 - Apply this to business-logic and critical-path tests always. For pure
-  rendering assertions with no logic branch involved, it is optional — note
+  rendering assertions with no logic branch involved, it is optional. Note
   in the final report if it was skipped and why.

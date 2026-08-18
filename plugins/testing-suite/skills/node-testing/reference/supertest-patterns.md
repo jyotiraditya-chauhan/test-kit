@@ -35,7 +35,7 @@ describe('GET /api/users', () => {
 
 Import and pass the raw `app` export to `request()`. Never call
 `app.listen()` in a test file, and never structure source code so that the
-exported app has already started listening as a side effect of import —
+exported app has already started listening as a side effect of import.
 `scripts/detect_stack.sh` flags `.listen(` calls outside test files so you
 can confirm they're the app's own bootstrap entrypoint, not something a
 test triggers. See [test-isolation.md](test-isolation.md) for why this
@@ -44,7 +44,7 @@ matters under parallel test workers.
 ## Runner choice
 
 Vitest for new ESM/TypeScript projects, Jest remains completely fine for
-existing suites — same logic as the frontend skills. As of Node 22 LTS,
+existing suites, same logic as the frontend skills. As of Node 22 LTS,
 Node's own built-in test runner (`node:test`) is also stable and
 TAP-compliant, a viable lightweight option for small services/libraries
 where minimizing dependencies matters, though its mocking ecosystem is

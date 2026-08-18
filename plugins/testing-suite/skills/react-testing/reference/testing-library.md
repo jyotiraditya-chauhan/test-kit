@@ -18,19 +18,19 @@ user-observable behavior, never on internal state.
 
 Most-to-least preferred:
 
-1. `getByRole` (and other accessibility-tree queries like `getByLabelText`)
-   — matches what a screen-reader/assistive-tech user would perceive, and
+1. `getByRole` (and other accessibility-tree queries like `getByLabelText`).
+   This matches what a screen-reader/assistive-tech user would perceive, and
    doubles as a free accessibility check.
-2. `getByText` — matches visible text content.
-3. `getByTestId` — last resort only, when no accessible/semantic query is
+2. `getByText`, which matches visible text content.
+3. `getByTestId`, a last resort for when no accessible or semantic query is
    possible. A testid has no meaning to a real user; overusing it is a mild
    anti-pattern smell worth flagging if the codebase leans on it heavily.
 
 ## user-event over fireEvent
 
-Use `@testing-library/user-event` (simulates a real browser event sequence
-— focus, then keydown, then input, then blur) over the lower-level
-`fireEvent` (dispatches a single synthetic event) wherever interaction
+Use `@testing-library/user-event` (it simulates a real browser event
+sequence: focus, then keydown, then input, then blur) over the lower-level
+`fireEvent` (which dispatches a single synthetic event) wherever interaction
 realism matters, which is most of the time:
 
 ```tsx
