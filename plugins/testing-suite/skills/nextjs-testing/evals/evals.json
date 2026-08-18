@@ -1,0 +1,79 @@
+{
+  "evals": [
+    {
+      "skills": ["nextjs-testing"],
+      "query": "Write a test for app/users/[id]/page.tsx, it fetches the user from our API and renders their name",
+      "files": [
+        {
+          "path": "package.json",
+          "content": "{\"name\":\"fake-next\",\"dependencies\":{\"react\":\"^18.3.0\",\"react-dom\":\"^18.3.0\",\"next\":\"^15.0.0\"},\"devDependencies\":{\"vitest\":\"^2.0.0\",\"@testing-library/react\":\"^16.0.0\",\"@playwright/test\":\"^1.45.0\"}}"
+        },
+        {
+          "path": "app/users/[id]/page.tsx",
+          "content": "export default async function UserPage({ params }: { params: { id: string } }) {\n  const res = await fetch(`http://localhost/api/users/${params.id}`);\n  const user = await res.json();\n  return <div>{user.name}</div>;\n}\n"
+        }
+      ],
+      "expected_behavior": [
+        "Detects App Router via scripts/detect_stack.sh and recognizes this specific page.tsx is an async Server Component (contains await in the component body)",
+        "Does NOT attempt to render this component directly under Vitest -- explicitly states Vitest cannot render async Server Components",
+        "Proposes either extracting the fetch into a plain testable function (per reference/async-server-components.md) or writing the test as a Playwright test instead, and explains the tradeoff",
+        "Asks the user a clarifying question covering both test layer and scope before generating tests",
+        "States an explicit test plan before writing any test code"
+      ]
+    },
+    {
+      "skills": ["nextjs-testing"],
+      "query": "Test the createOrder Server Action in app/actions/order.ts -- it validates input with zod and writes to the database",
+      "files": [
+        {
+          "path": "package.json",
+          "content": "{\"name\":\"fake-next\",\"dependencies\":{\"react\":\"^18.3.0\",\"react-dom\":\"^18.3.0\",\"next\":\"^15.0.0\",\"zod\":\"^3.23.0\"},\"devDependencies\":{\"vitest\":\"^2.0.0\"}}"
+        },
+        {
+          "path": "app/actions/order.ts",
+          "content": "'use server';\nimport { z } from 'zod';\n\nconst OrderSchema = z.object({ itemId: z.string(), quantity: z.number().positive() });\n\nexport async function createOrder(input: unknown) {\n  const parsed = OrderSchema.parse(input);\n  // ...write to database\n  return { id: 'order_1', ...parsed };\n}\n"
+        }
+      ],
+      "expected_behavior": [
+        "Tests createOrder as a plain async function via Vitest, not through a rendered component tree",
+        "Flags this as a critical/data-write path (order creation) requiring elevated rigor even though the user's request was narrower",
+        "Covers a valid-input happy path, an invalid-input case (zod validation failure), and a boundary case (quantity <= 0)",
+        "Runs the mandatory fault-injection self-check from reference/verification.md on this business-logic test",
+        "Reports back what was covered and confirms the fault-injection check passed"
+      ]
+    },
+    {
+      "skills": ["nextjs-testing"],
+      "query": "Write a test for the GET handler in app/api/health/route.ts",
+      "files": [
+        {
+          "path": "package.json",
+          "content": "{\"name\":\"fake-next\",\"dependencies\":{\"react\":\"^18.3.0\",\"react-dom\":\"^18.3.0\",\"next\":\"^15.0.0\"},\"devDependencies\":{\"vitest\":\"^2.0.0\"}}"
+        },
+        {
+          "path": "app/api/health/route.ts",
+          "content": "export async function GET() {\n  return Response.json({ status: 'ok' });\n}\n"
+        }
+      ],
+      "expected_behavior": [
+        "Imports and invokes the exported GET handler directly with Vitest, per reference/api-and-middleware.md, rather than treating it like a rendered component",
+        "Does not reach for Playwright for this -- a route handler is directly Vitest-testable",
+        "Asserts on the actual response status and body shape, not just that the call didn't throw"
+      ]
+    },
+    {
+      "skills": ["nextjs-testing"],
+      "query": "Test my LoginButton.tsx component with React Testing Library",
+      "files": [
+        {
+          "path": "package.json",
+          "content": "{\"name\":\"fake-react\",\"dependencies\":{\"react\":\"^18.3.0\",\"react-dom\":\"^18.3.0\"}}"
+        }
+      ],
+      "expected_behavior": [
+        "Does NOT proceed as nextjs-testing -- package.json has no 'next' dependency, so scripts/detect_stack.sh (or equivalent reasoning) errors out / declines",
+        "Clearly states this is a plain React project and react-testing is the correct skill instead"
+      ]
+    }
+  ]
+}
