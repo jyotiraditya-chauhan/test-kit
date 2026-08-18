@@ -1,7 +1,7 @@
 {
   "name": "testing-suite",
   "description": "Stack-aware test generation for Flutter, React, Next.js, Swift/SwiftUI, and Node/Express. Detects the project's existing conventions, elicits scope from the user, generates AAA-structured tests with boundary-only mocking, and self-verifies with a fault-injection check before reporting coverage honestly.",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "author": {
     "name": "jyotiraditya-chauhan",
     "email": "adityachauhan0369@gmail.com"
