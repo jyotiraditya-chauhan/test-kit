@@ -41,7 +41,7 @@ library, golden-test helper, and Firebase fakes are already declared in
 `pubspec.yaml`, plus whether `test/` already exists and mirrors `lib/`.
 
 If a test framework or mocking library is already in use, follow it even if
-a different tool is this skill's 2026 default. Never introduce a second,
+a different tool is this skill's default recommendation. Never introduce a second,
 competing library into a project that already picked one.
 
 ## Step 2 — Audit project structure

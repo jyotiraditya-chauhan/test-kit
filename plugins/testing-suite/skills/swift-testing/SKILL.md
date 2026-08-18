@@ -43,7 +43,7 @@ whether Swift Testing (`@Test`), XCTest, or both are already in use, plus
 presence.
 
 If a test framework is already in use, follow it even if a different tool
-is this skill's 2026 default (Swift Testing for new code). Never generate
+is this skill's default recommendation (Swift Testing for new code). Never generate
 an `XCTAssert*` call inside a `@Test` function or vice versa — see
 [reference/swift-testing-vs-xctest.md](reference/swift-testing-vs-xctest.md);
 the two frameworks are not cross-compatible and a misplaced assertion

@@ -61,7 +61,7 @@
         }
       ],
       "expected_behavior": [
-        "Detects that XCTest already dominates the test target via scripts/detect_stack.sh and matches it -- generates XCTestCase/XCTAssert-style tests, not @Test/#expect, even though Swift Testing is this skill's 2026 default",
+        "Detects that XCTest already dominates the test target via scripts/detect_stack.sh and matches it -- generates XCTestCase/XCTAssert-style tests, not @Test/#expect, even though Swift Testing is this skill's default recommendation",
         "Covers a happy-path case, an empty-array boundary case, and a discount edge case",
         "Runs the fault-injection self-check on this business-logic test",
         "Does not introduce Swift Testing as a second, competing framework into a codebase that already consistently uses XCTest"

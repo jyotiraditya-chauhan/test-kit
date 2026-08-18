@@ -43,7 +43,7 @@ runner (Vitest/Jest), RTL/user-event, MSW, Playwright/Cypress, and test file
 convention (co-located `*.test.tsx` vs `__tests__/`).
 
 If a test runner or mocking library is already in use, follow it even if a
-different tool is this skill's 2026 default. Never introduce a second,
+different tool is this skill's default recommendation. Never introduce a second,
 competing test runner into a project that already picked one.
 
 ## Step 2 — Audit project structure

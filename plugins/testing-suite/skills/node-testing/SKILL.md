@@ -44,7 +44,7 @@ present, plus a check for `.listen()` calls outside test files — a common
 port-binding footgun under parallel test workers.
 
 If a test runner or HTTP-testing library is already in use, follow it even
-if a different tool is this skill's 2026 default. Never introduce a second,
+if a different tool is this skill's default recommendation. Never introduce a second,
 competing test runner into a project that already picked one.
 
 ## Step 2 — Audit project structure
