@@ -71,3 +71,16 @@ Validate before committing:
 ```
 claude plugin validate ./plugins/testing-suite
 ```
+
+## Why "ask, don't assume" and fault-injection matter
+
+Left unconstrained, an AI agent tends to write tests that confirm what its
+own implementation already does rather than what it should do — a suite
+that can hit 100% coverage while asserting nothing. See the root
+[README's "Why this exists"](../../README.md#why-this-exists) section for
+the research this guards against and a live, end-to-end proof that the
+fault-injection self-check actually catches it.
+
+## License
+
+MIT — see [LICENSE](../../LICENSE) in the repository root.
