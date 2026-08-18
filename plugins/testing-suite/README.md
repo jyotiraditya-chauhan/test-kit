@@ -1,17 +1,18 @@
 # testing-suite
 
-A Claude Code plugin that bundles five platform-specific test-generation
+A Claude Code plugin that bundles five platform-specific test-writing
 skills. Each skill detects the project's stack and existing test
-conventions, asks what to test before generating anything, writes tests
-that follow the trophy/pyramid model appropriate to that platform, and
-verifies its own output with a mandatory fault-injection self-check before
-reporting coverage honestly.
+conventions, asks what to test before generating anything, and writes
+tests that follow the trophy/pyramid model appropriate to that platform.
+**Writing the test files is the deliverable.** Running them and verifying
+them with a fault-injection self-check is available on request, never
+automatic.
 
 ## Skills
 
 | Skill | Namespaced as | Covers |
 |---|---|---|
-| `flutter-testing` | `/testing-suite:flutter-testing` | Flutter unit, widget, golden, and integration tests. Detects BLoC/Riverpod/Provider/GetX from `pubspec.yaml` and selects the matching harness pattern. |
+| `flutter-testing` | `/testing-suite:flutter-testing` | Flutter unit, widget, golden, and integration tests — each a first-class layer with its own reference doc. Detects BLoC/Riverpod/Provider/GetX from `pubspec.yaml` and selects the matching harness pattern. |
 | `react-testing` | `/testing-suite:react-testing` | Plain React (Vite/CRA, non-Next) unit and component/integration tests with Vitest/Jest, React Testing Library, and MSW for network-boundary mocking. |
 | `nextjs-testing` | `/testing-suite:nextjs-testing` | Next.js (App Router or Pages Router) tests, split between Vitest (Server Actions, schema validation, sync components) and Playwright (async Server Components, auth, checkout — the layer Vitest structurally cannot render). |
 | `swift-testing` | `/testing-suite:swift-testing` | Swift/SwiftUI unit, view-model, and snapshot tests. Defaults to Swift Testing (`@Test`/`#expect`), keeps XCTest where it already exists, and tests the view model directly since SwiftUI has no public view-tree introspection. |
@@ -39,14 +40,15 @@ refuses a project with `next` in `package.json`).
    specific edge cases planned, before any test code is written.
 5. **Generate** — AAA-structured tests, boundary-only mocking/faking,
    matching the project's existing style, with minimal comments.
-6. **Self-verify** — run the new tests, then run a mandatory
+6. **Report, then offer** — list what was written and what each test
+   covers. Nothing is run yet, and nothing is claimed to pass or fail.
+   Offer to run and verify — don't do it unprompted.
+7. **Only if asked** — run the new tests, then run the mandatory
    fault-injection self-check on business-logic/critical-path tests:
    deliberately break the implementation, confirm the test goes red, revert
-   the break. A test that stays green against broken code gets rewritten,
-   not accepted.
-7. **Report honestly** — what was covered, what was explicitly left out
-   and why, and whether any test was flagged and rewritten. Never a blanket
-   "fully tested" claim.
+   the break, and report honestly what was covered, what was left out, and
+   whether any test was flagged and rewritten. Never a blanket "fully
+   tested" claim.
 
 ## Install
 
@@ -71,6 +73,15 @@ Validate before committing:
 ```
 claude plugin validate ./plugins/testing-suite
 ```
+
+## Flutter goes deeper than the rest
+
+`flutter-testing` has a dedicated reference doc per layer — unit, widget,
+golden, and integration — plus cross-cutting docs for state management,
+Firebase fakes, and CI/distribution shape, and a second script
+(`scaffold_test_file.sh`) for mirroring `lib/` into `test/`. See the root
+README's [Flutter, in depth](../../README.md#flutter-in-depth) section for
+the full breakdown.
 
 ## Why "ask, don't assume" and fault-injection matter
 

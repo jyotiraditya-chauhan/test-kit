@@ -1,18 +1,42 @@
 # testKit
 
-**A Claude Code plugin marketplace for stack-aware, self-verifying test generation.**
+**A Claude Code plugin marketplace for stack-aware test writing.**
 
 `testKit` hosts **testing-suite**, one plugin bundling five platform skills —
 Flutter, React, Next.js, Swift/SwiftUI, and Node/Express — that detect a
 project's real stack and conventions, ask before assuming what to test, and
-prove each generated test actually checks something before calling it done.
+write tests that follow the project's own style. Flutter gets the deepest
+coverage of the five: unit, widget, golden, and integration tests are each
+first-class, not an afterthought behind widget tests.
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![Plugin](https://img.shields.io/badge/Claude%20Code-Plugin-5A45FF.svg)](https://code.claude.com/docs/en/plugins)
-[![Version](https://img.shields.io/badge/version-1.0.0-blue.svg)](plugins/testing-suite/.claude-plugin/plugin.json)
+[![Version](https://img.shields.io/badge/version-2.0.0-blue.svg)](plugins/testing-suite/.claude-plugin/plugin.json)
 [![Skills](https://img.shields.io/badge/skills-5-informational.svg)](#the-five-skills)
 
 ---
+
+## What this does — and doesn't — do
+
+**This plugin writes test files. That's the deliverable.** Every skill
+detects your stack, asks what you want tested, plans, and writes real,
+correctly-structured test files that match your project's conventions —
+and stops there.
+
+It does **not** run your tests, report coverage, or "grade" your codebase
+by default. If you want a generated suite actually executed and verified —
+including the [fault-injection self-check](#the-fault-injection-self-check)
+described below — just ask, in the same request or a follow-up. Every
+skill offers this after writing tests; none of them do it unless you say
+yes. Nothing runs silently, and no test is ever reported as "passing"
+unless it was actually run.
+
+| | |
+|---|---|
+| ✅ Writes unit, widget, component, golden/snapshot, and integration tests | ❌ Does not run your CI pipeline or lint your codebase |
+| ✅ Matches your existing test framework, mocking library, and file conventions | ❌ Does not silently rewrite or delete your existing tests |
+| ✅ Asks which layer and scope before generating anything | ❌ Does not assume "test everything" or "test just this file" |
+| ✅ Runs and verifies tests **when you ask it to** | ❌ Does not run `flutter test` / `npm test` / `xcodebuild` on its own |
 
 ## Why this exists
 
@@ -36,13 +60,16 @@ quality degrading as AI accelerates development, and separately, 58% of
 developers report trusting AI-generated output without testing it at all —
 polish reads as correctness, and it isn't.
 
-Every skill in this plugin is built around the direct countermeasure: plan
-before generating, mock only at the true I/O boundary, and — for every
-business-logic or critical-path test — run a **fault-injection self-check**
-that deliberately breaks the implementation, confirms the new test actually
-notices, then reverts the break. A test that stays green against
-known-broken code is rewritten, not accepted. See
-[The fault-injection self-check](#the-fault-injection-self-check) below.
+Every skill in this plugin is built to counter that: plan before
+generating, mock only at the true I/O boundary, write strong and specific
+assertions — and, when you ask for verification, run a
+**fault-injection self-check** that deliberately breaks the implementation
+and confirms the new test actually notices before reverting the break. A
+test that stays green against known-broken code is rewritten, not
+accepted. This check is available on request, not automatic — see
+[What this does — and doesn't — do](#what-this-does--and-doesnt--do)
+above and [The fault-injection self-check](#the-fault-injection-self-check)
+below.
 
 ## Installation
 
@@ -81,11 +108,15 @@ Or invoke a skill directly, namespaced under the plugin:
 /testing-suite:node-testing
 ```
 
+By default you'll get the test files and a summary of what each test
+covers. Add "and run them" / "and verify they work" to the same request if
+you also want them executed and fault-injection-checked.
+
 ## The five skills
 
 | Skill | Command | Fires on | Default stack |
 |---|---|---|---|
-| **flutter-testing** | `/testing-suite:flutter-testing` | `pubspec.yaml` with a `flutter:` SDK dependency | `flutter_test`, `mocktail`, `bloc_test` / `ProviderContainer`, `golden_toolkit` |
+| **flutter-testing** | `/testing-suite:flutter-testing` | `pubspec.yaml` with a `flutter:` SDK dependency | `flutter_test`, `mocktail`, `bloc_test` / `ProviderContainer`, `golden_toolkit`, `integration_test` / Patrol |
 | **react-testing** | `/testing-suite:react-testing` | `package.json` with `react`+`react-dom`, no `next` | Vitest/Jest, React Testing Library, MSW |
 | **nextjs-testing** | `/testing-suite:nextjs-testing` | `package.json` with `next` | Vitest (Server Actions, sync components) + Playwright (async Server Components, auth, checkout) |
 | **swift-testing** | `/testing-suite:swift-testing` | `.xcodeproj` / `.xcworkspace` / `Package.swift` | Swift Testing (`@Test`/`#expect`), XCTest where it already exists, `swift-snapshot-testing` |
@@ -97,6 +128,42 @@ stack — `react-testing` refuses a `next` dependency, `node-testing` refuses
 a project with no backend framework, and so on. Verified directly: running
 each skill against every other skill's fixture project produces a clean
 decline, not a wrong-platform test.
+
+## Flutter, in depth
+
+Flutter gets the deepest treatment in this plugin — all four test types
+are equally first-class, each with its own reference doc, not folded into
+a generic "widget testing" default:
+
+| Layer | What it's for | Tooling | Reference |
+|---|---|---|---|
+| **Unit** | Pure Dart logic — services, repositories, formatters, validators. No widget tree. | `package:test`, `mocktail` | [`reference/unit-testing.md`](plugins/testing-suite/skills/flutter-testing/reference/unit-testing.md) |
+| **Widget** | A single widget or small tree — rendering, interaction, layout. | `flutter_test`, `WidgetTester` | [`reference/widget-testing.md`](plugins/testing-suite/skills/flutter-testing/reference/widget-testing.md) |
+| **Golden** | Pixel-level visual regression for small, stable design-system components. | `golden_toolkit` / `alchemist` | [`reference/golden-tests.md`](plugins/testing-suite/skills/flutter-testing/reference/golden-tests.md) |
+| **Integration** | Full app on a real device/emulator — Flutter's closest thing to E2E. Reserved for critical flows. | `integration_test`, Patrol for native-OS interactions | [`reference/integration-testing.md`](plugins/testing-suite/skills/flutter-testing/reference/integration-testing.md) |
+
+Plus cross-cutting reference docs that apply across all four layers:
+
+- [`reference/state-management.md`](plugins/testing-suite/skills/flutter-testing/reference/state-management.md) — detects BLoC, Riverpod, Provider, or GetX from `pubspec.yaml` and selects the matching harness. A BLoC-style test is never generated for a Riverpod provider, or vice versa.
+- [`reference/firebase.md`](plugins/testing-suite/skills/flutter-testing/reference/firebase.md) — `fake_cloud_firestore` and `firebase_auth_mocks` patterns, including security-rules testing and when to reach for the real Firebase emulator instead.
+- [`reference/ci-and-distribution.md`](plugins/testing-suite/skills/flutter-testing/reference/ci-and-distribution.md) — the recommended ~60/25/10/5 unit/widget/integration/golden shape, and why integration tests alone justify macOS CI runners while everything else stays on cheaper Linux ones.
+
+Two scripts specific to Flutter:
+
+- `scripts/detect_stack.sh` — confirms the project, and reports the
+  state-management package, mocking library, golden-test helper, Firebase
+  fakes, and existing `test/` convention already in use.
+- `scripts/scaffold_test_file.sh lib/path/to/file.dart` — a small,
+  deterministic convenience: creates the correctly-mirrored `test/` stub
+  file for a given `lib/` source file. Never overwrites an existing test.
+  Optional — the skill doesn't require it, but it saves a step.
+
+Ask for any single layer directly ("write unit tests for `OrderService`",
+"add a golden test for `ProductCard`", "write an integration test for the
+checkout flow") or let the skill propose the right mix for what you're
+testing — it defaults to a pyramid shape (mostly unit, a solid slice of
+widget, integration reserved for the genuinely critical path) unless you
+say otherwise.
 
 ## How every skill works
 
@@ -121,18 +188,22 @@ is the operational backbone documented in each `SKILL.md`:
 5. Generate                -> AAA structure, boundary-only mocking,
                               matches the project's existing style,
                               minimal comments.
-6. Self-verify             -> run the new tests, then run the mandatory
+6. Report, then offer      -> list what was written and what each test
+                              covers. Nothing is run. Offer to run and
+                              verify -- do not do it unless asked.
+7. Only if asked           -> run the tests, run the mandatory
                               fault-injection check on business-logic
-                              tests (see below).
-7. Report honestly         -> what's covered, what's explicitly left out
-                              and why, what got rewritten. Never a
-                              blanket "fully tested" claim.
+                              tests, report honestly what's covered.
 ```
+
+Step 6 is where most requests end, and that's by design — see
+[What this does — and doesn't — do](#what-this-does--and-doesnt--do).
 
 ## The fault-injection self-check
 
-This is the plugin's one non-negotiable, low-freedom procedure — every
-`reference/verification.md` states it near-verbatim rather than as a
+This runs only when you ask for verification (Step 7 above) — but once
+triggered, it's the plugin's one non-negotiable, low-freedom procedure.
+Every `reference/verification.md` states it near-verbatim rather than as a
 loose suggestion, because it's the single highest-leverage defense against
 the self-confirmation trap described above:
 
@@ -146,29 +217,20 @@ the self-confirmation trap described above:
 
 Verified for real, not just described: in a live end-to-end run against a
 Node/Express fixture, the skill generated a `calculateShippingCost` test
-suite, ran the fault-injection check, and reverted cleanly — the
-implementation file came back byte-identical to its original, and every
-generated assertion checked an exact value (`toBe`, `toBeCloseTo`, a
+suite, ran the fault-injection check on request, and reverted cleanly —
+the implementation file came back byte-identical to its original, and
+every generated assertion checked an exact value (`toBe`, `toBeCloseTo`, a
 specific thrown message), not just that a call didn't throw.
 
 ## Worked example
 
+**Default behavior — just ask for tests:**
+
 **Prompt:** *"Add tests for the calculateShippingCost function in
 src/services/shipping.js, it's pure logic."*
 
-**What node-testing does, end to end:**
-
 ```js
-// src/services/shipping.js (unchanged after the run)
-export function calculateShippingCost(weightKg, expedited = false) {
-  if (weightKg <= 0) throw new Error('weight must be positive');
-  const base = weightKg * 2.5;
-  return expedited ? base * 1.5 : base;
-}
-```
-
-```js
-// src/services/shipping.test.js (generated)
+// src/services/shipping.test.js (written)
 import { describe, it, expect } from 'vitest';
 import { calculateShippingCost } from './shipping.js';
 
@@ -195,10 +257,17 @@ describe('calculateShippingCost', () => {
 });
 ```
 
-Happy path, a default-parameter case, a fractional-input boundary, and both
-zero and negative error paths — six cases from one function, each tied to
-something that would actually break under a regression, confirmed by
-deliberately breaking the function and watching the right test fail.
+> Wrote `src/services/shipping.test.js` with 6 cases: standard cost,
+> expedited multiplier, default-flag equivalence, fractional weight, and
+> both zero/negative error paths. **Not run yet — want me to run these and
+> verify them before you review them?**
+
+**If you say yes** (here or in a follow-up), Step 7 kicks in for real:
+the suite is executed, the fault-injection check deliberately breaks
+`calculateShippingCost` (e.g. swaps the `2.5` rate), re-runs the same
+tests, confirms they go red, then restores the file to its original state
+— proof the suite would actually catch a regression, not just that it
+runs.
 
 ## Repository layout
 
@@ -208,13 +277,14 @@ deliberately breaking the function and watching the right test fail.
 plugins/
   testing-suite/
     .claude-plugin/
-      plugin.json                # plugin manifest (v1.0.0)
+      plugin.json                # plugin manifest (v2.0.0)
     skills/
       flutter-testing/
         SKILL.md
-        reference/                # state management, Firebase fakes,
-                                   # golden tests, fault-injection
-        scripts/detect_stack.sh
+        reference/                # unit, widget, golden, integration,
+                                   # state management, Firebase fakes,
+                                   # CI/distribution, fault-injection
+        scripts/                  # detect_stack.sh, scaffold_test_file.sh
         evals/evals.json
       react-testing/               # same shape
       nextjs-testing/              # same shape
@@ -240,6 +310,43 @@ claude plugin validate ./plugins/testing-suite --strict
 claude plugin validate . --strict
 ```
 
+## FAQ
+
+**Does it run my tests automatically?**
+No. It writes them and tells you what each one covers, then offers to run
+and verify. It only executes anything if you say yes — see
+[What this does — and doesn't — do](#what-this-does--and-doesnt--do).
+
+**Do I need the Flutter SDK / Node / Xcode installed for it to write tests?**
+No for writing. Stack *detection* (`scripts/detect_stack.sh`) reads your
+manifest files and doesn't need the toolchain. You only need the real
+toolchain installed if you ask the skill to actually run and verify tests.
+
+**Will it overwrite my existing tests?**
+No. Every skill detects your existing test framework, mocking library, and
+file-naming convention first and matches them rather than introducing a
+competing one. `scaffold_test_file.sh` (Flutter) explicitly refuses to
+overwrite an existing test file.
+
+**What if I want tests for the whole app, not just one file?**
+Say so. Every skill's Step 3 explicitly asks whether you want the whole
+app, one feature, or specific files tested — it never assumes either
+direction on its own.
+
+**Can I use this outside Claude Code — claude.ai, the API?**
+Not well. These skills need real toolchains (`flutter`, `npm`, `xcodebuild`)
+to detect conventions and optionally run tests, which fits Claude Code's
+local/CLI environment, not the sandboxed, network-isolated execution
+environments claude.ai and the Claude API's code-execution tool use. See
+[Research base](#research-base) below.
+
+**Which skill fires if my repo has both a Flutter app and a Node backend?**
+Whichever one matches the file you're pointing at. Each skill's
+`paths` frontmatter and `scripts/detect_stack.sh` scope it to its own
+stack's manifest and file extensions, so a request about a `.dart` file
+triggers `flutter-testing` and a request about a route handler triggers
+`node-testing`, even in the same monorepo.
+
 ## Research base
 
 This plugin's testing guidance (per-platform tooling, the trophy/pyramid
@@ -255,6 +362,13 @@ software-leader survey, both referenced in that research base.
 
 ## Version history
 
+- **2.0.0** — Test execution and the fault-injection self-check became
+  opt-in rather than automatic: writing correct test files is each skill's
+  deliverable on its own; running and verifying them now happens only on
+  request. Deep-dived Flutter specifically: dedicated reference docs for
+  unit, widget, and integration testing (previously only golden tests and
+  state management had their own files), a CI/distribution-shape doc, and
+  a new `scaffold_test_file.sh` convenience script.
 - **1.0.0** — Initial release: five platform skills, domain-split
   reference docs, `detect_stack.sh` per platform, `evals/evals.json` per
   skill, fault-injection self-check verified end-to-end.
