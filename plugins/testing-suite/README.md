@@ -56,8 +56,8 @@ From within Claude Code, add this repository as a marketplace and install
 the plugin:
 
 ```
-/plugin marketplace add jyotiraditya-chauhan/testKit
-/plugin install testing-suite@testkit-marketplace
+/plugin marketplace add jyotiraditya-chauhan/test-kit
+/plugin install testing-suite@test-kit-marketplace
 ```
 
 ## Local development

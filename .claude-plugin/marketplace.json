@@ -1,5 +1,5 @@
 {
-  "name": "testkit-marketplace",
+  "name": "test-kit-marketplace",
   "description": "A marketplace hosting the testing-suite plugin: stack-aware test generation skills for Flutter, React, Next.js, Swift/SwiftUI, and Node/Express.",
   "owner": {
     "name": "jyotiraditya-chauhan",

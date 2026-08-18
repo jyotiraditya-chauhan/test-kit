@@ -1,8 +1,8 @@
-# testKit
+# test-kit
 
 **A Claude Code plugin marketplace for stack-aware test writing.**
 
-`testKit` hosts **testing-suite**, one plugin bundling five platform skills —
+`test-kit` hosts **testing-suite**, one plugin bundling five platform skills —
 Flutter, React, Next.js, Swift/SwiftUI, and Node/Express — that detect a
 project's real stack and conventions, ask before assuming what to test, and
 write tests that follow the project's own style. Flutter gets the deepest
@@ -76,15 +76,15 @@ below.
 Inside Claude Code:
 
 ```
-/plugin marketplace add jyotiraditya-chauhan/testKit
-/plugin install testing-suite@testkit-marketplace
+/plugin marketplace add jyotiraditya-chauhan/test-kit
+/plugin install testing-suite@test-kit-marketplace
 ```
 
 Or non-interactively:
 
 ```bash
-claude plugin marketplace add jyotiraditya-chauhan/testKit
-claude plugin install testing-suite@testkit-marketplace
+claude plugin marketplace add jyotiraditya-chauhan/test-kit
+claude plugin install testing-suite@test-kit-marketplace
 ```
 
 ## Usage
