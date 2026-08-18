@@ -1,0 +1,55 @@
+# Fault-Injection Self-Check
+
+This is a mandatory, low-freedom procedure. Follow it exactly, in this
+order, for every business-logic or critical-path test (auth, payment, any
+data-write path — including view-model logic) generated this session. Do
+not skip steps, do not substitute your own variation, do not summarize it
+away.
+
+Why this exists: code coverage measures which lines executed, not whether
+the test actually verifies anything. It is common for a generated test to
+hit 100% line coverage while asserting nothing meaningful. This procedure
+is a lightweight, single-test-scoped approximation of mutation testing that
+catches that failure mode in seconds, with no extra tooling.
+
+## Procedure
+
+1. Run the new test against the real, unmodified implementation. Confirm it
+   is GREEN. If it is red against correct code, the test itself is wrong —
+   fix the test now, do not touch the implementation to satisfy a bad test.
+
+2. Open the implementation file (typically the view model) the test
+   targets. Introduce exactly ONE small, obvious fault, chosen from this
+   list, in the specific line(s) the new test is meant to cover:
+   - Flip a comparison operator (`>` to `>=`, `==` to `!=`, `&&` to `||`).
+   - Change a returned literal or default value (`true` to `false`,
+     `0` to `1`).
+   - Skip an early-return/guard branch (comment it out or invert its
+     condition).
+
+3. Re-run the exact same new test (not the whole suite — just this test).
+
+4. Confirm it now FAILS (goes RED). This is the required outcome.
+   - If it fails: the test is verifying real behavior. Proceed to step 5.
+   - If it still PASSES against the deliberately broken code: the test is
+     flagged as weak. Do not count it as passing coverage. Rewrite the
+     assertion to check the actual value/behavior, and restart this
+     procedure from step 1 for the rewritten test.
+
+5. Revert the deliberate fault immediately — restore the implementation
+   file to its exact original state. Re-run the test once more to confirm
+   it is GREEN again against the real, correct implementation.
+
+6. Record which tests were fault-injection-checked and whether any were
+   rewritten, for the final report back to the user.
+
+## Non-negotiable rules
+
+- Never leave the deliberate fault in the implementation file. Step 5 is
+  not optional.
+- Never delete or disable a test to make it pass. A test that fails against
+  correct code gets fixed, not removed. A test that passes against broken
+  code gets rewritten, not accepted.
+- Apply this to view-model and business-logic tests always. For pure
+  snapshot/rendering assertions, it is optional — note in the final report
+  if it was skipped and why.
