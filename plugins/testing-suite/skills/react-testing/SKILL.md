@@ -1,9 +1,140 @@
 ---
 name: react-testing
-description: Placeholder - being built in Phase 1.
+description: Generates unit, component, and integration tests for plain React projects (Vite, Create React App, or any non-Next.js React app) using Vitest or Jest with React Testing Library and MSW for network mocking. Use when the user asks to test a React component or hook, mentions .tsx/.jsx files, Vitest, Jest, React Testing Library, RTL, or MSW, in a project whose package.json has react and react-dom but not next. For Next.js projects (an app/ or pages/ directory, next.config.*), use nextjs-testing instead.
 license: MIT
+compatibility: Requires Node.js and the project's existing package manager (npm/pnpm/yarn). Requires a package.json declaring react and react-dom without next.
+metadata:
+  platform: react
+  report-source: testing-methodologies-deep-research-report.txt Part 3 and Part 8
+allowed-tools: Read, Write, Edit, Grep, Glob, Bash
+paths:
+  - "**/*.tsx"
+  - "**/*.jsx"
+  - "package.json"
 ---
 
 # React Testing
 
-Placeholder skill body. Content added in Phase 1.
+Generates unit, component, and integration tests for plain React (non-Next)
+projects, following the testing trophy model: a fat integration-test middle
+using real state + MSW-mocked network, a thin unit layer for pure logic
+only, and a small curated E2E layer.
+
+## Progress checklist
+
+Copy this into your response and check items off as you go:
+
+```
+- [ ] 1. Detect stack (scripts/detect_stack.sh)
+- [ ] 2. Audit project structure and existing test conventions
+- [ ] 3. Ask the user what to test (layer + scope) — do not assume
+- [ ] 4. State the test plan explicitly
+- [ ] 5. Generate tests following AAA, boundary-only (MSW) mocking
+- [ ] 6. Run tests; fault-injection self-check on business-logic tests
+- [ ] 7. Report back honestly: covered, not covered, anything rewritten
+```
+
+## Step 1 — Detect stack
+
+Run `scripts/detect_stack.sh` from the project root. It confirms this is a
+plain React project (not Next.js — the script errors out and points to
+`nextjs-testing` if `next` is present), and reports the existing test
+runner (Vitest/Jest), RTL/user-event, MSW, Playwright/Cypress, and test file
+convention (co-located `*.test.tsx` vs `__tests__/`).
+
+If a test runner or mocking library is already in use, follow it even if a
+different tool is this skill's 2026 default. Never introduce a second,
+competing test runner into a project that already picked one.
+
+## Step 2 — Audit project structure
+
+Before writing anything:
+- Classify the target: a pure function (formatter, calculator, reducer) vs
+  a component that fetches/renders/handles-errors vs a custom hook. Most
+  components in a modern app are integration code, not meaningful "units" —
+  default to a component/integration test for anything that renders,
+  reserve pure unit tests for genuinely pure logic. See
+  [reference/test-layers.md](reference/test-layers.md).
+- Match the existing test file convention exactly (co-located vs
+  `__tests__/`) from Step 1.
+- Flag critical paths — authentication, payment/billing, any data-write
+  operation — for elevated rigor even if the user's request was narrower.
+  State this flag out loud; do not silently expand scope.
+
+## Step 3 — Ask the user what to test (never assume)
+
+Ask a single message with two questions before generating anything:
+
+1. **Layer**: unit tests only (pure logic) / component tests only /
+   integration tests (component + real state + MSW network) / a mix
+   appropriate to what's being tested.
+2. **Scope**: does the user want the whole app tested, one feature/module
+   tested end-to-end, or just specific file(s)/component(s)? Do not assume
+   "the whole app" or "just this file" — ask explicitly and wait for the
+   answer. If the user's original request already named specific files or
+   a feature, confirm that scope back to them rather than silently
+   re-asking, but still confirm it.
+
+Only skip re-asking if the user's original request already unambiguously
+answered both questions.
+
+## Step 4 — State the plan before generating
+
+State explicitly: which layer(s), which file(s)/component(s) are in scope,
+what will be mocked vs exercised for real (MSW at the network boundary
+only — never mock a pure function or a same-layer collaborator), and the
+specific edge cases planned (empty/loading state, error state, boundary
+props). This is the checkpoint for the user to redirect before code exists.
+
+## Step 5 — Generate
+
+- Follow the project's existing import style, naming, and setup/fixture
+  patterns from Step 1-2.
+- Structure every test as Arrange/Act/Assert, one Act per test.
+- Every unit under test gets at minimum: one happy-path case, one boundary/
+  empty case, one error-path case — unless the user scoped it narrower.
+- Query priority and `user-event` usage: see
+  [reference/testing-library.md](reference/testing-library.md).
+- Network mocking: see [reference/mocking-msw.md](reference/mocking-msw.md)
+  — mock only at the network boundary via MSW, never at the module level.
+- Do not generate an E2E/Playwright test for something a component or
+  integration test covers just as well; see
+  [reference/e2e-and-antipatterns.md](reference/e2e-and-antipatterns.md).
+- Keep comments in generated test code minimal — at most one short comment
+  per test, only where the reason for a specific setup value or edge case
+  isn't obvious from the test name and code itself. Do not narrate what
+  each line does.
+
+## Step 6 — Self-verification (mandatory)
+
+1. Run the new test(s) against the real implementation. Confirm green. A
+   test that's red against correct code is a wrong test — fix the test, do
+   not change working code to satisfy it.
+2. For every business-logic or critical-path test: run the fault-injection
+   self-check in [reference/verification.md](reference/verification.md)
+   exactly as written. Any test that stays green against deliberately
+   broken code must be rewritten before being counted as passing coverage.
+3. Check for accidental non-determinism: real network calls not routed
+   through MSW, unseeded randomness, `setTimeout`-based waits instead of
+   RTL's `findBy`/`waitFor`, order-dependence on other tests. Fix in place.
+
+## Step 7 — Report back
+
+Summarize specifically: which layer(s) were tested, which edge cases were
+covered, what was intentionally left out of scope and why, whether any test
+was flagged and rewritten during Step 6, and the coverage delta if
+measurable. Never claim "fully tested" or "all done" without this detail.
+
+## Reference
+
+- RTL query priority, user-event, testing hooks: [reference/testing-library.md](reference/testing-library.md)
+- MSW network-boundary mocking: [reference/mocking-msw.md](reference/mocking-msw.md)
+- Unit vs component vs integration, distribution shape, snapshot caution: [reference/test-layers.md](reference/test-layers.md)
+- Playwright/Cypress and explicit anti-patterns: [reference/e2e-and-antipatterns.md](reference/e2e-and-antipatterns.md)
+- Fault-injection self-check procedure (mandatory, follow verbatim): [reference/verification.md](reference/verification.md)
+
+## Scripts
+
+Run `scripts/detect_stack.sh` from the project root before generating any
+test — it confirms this is a plain React (not Next.js) project and prints
+the detected test runner, RTL, MSW, and E2E tooling.

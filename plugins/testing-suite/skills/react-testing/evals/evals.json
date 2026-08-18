@@ -1,0 +1,82 @@
+{
+  "evals": [
+    {
+      "skills": ["react-testing"],
+      "query": "Write tests for my SearchInput component",
+      "files": [
+        {
+          "path": "package.json",
+          "content": "{\"name\":\"fake-app\",\"dependencies\":{\"react\":\"^18.3.0\",\"react-dom\":\"^18.3.0\"},\"devDependencies\":{\"vitest\":\"^2.0.0\",\"@testing-library/react\":\"^16.0.0\",\"@testing-library/user-event\":\"^14.5.0\"}}"
+        },
+        {
+          "path": "src/components/SearchInput.tsx",
+          "content": "export function SearchInput({ onSearch }: { onSearch: (q: string) => void }) {\n  return <input aria-label=\"Search\" onChange={(e) => onSearch(e.target.value)} />;\n}\n"
+        }
+      ],
+      "expected_behavior": [
+        "Runs scripts/detect_stack.sh or otherwise confirms this is a plain React project (not Next.js) and that Vitest + RTL are already present",
+        "Asks the user a clarifying question covering both test layer and scope before generating tests, rather than assuming",
+        "Uses getByLabelText/getByRole (accessibility-tree query) rather than getByTestId, since SearchInput has an aria-label",
+        "Uses @testing-library/user-event rather than fireEvent for the typing interaction",
+        "States an explicit test plan before writing test code",
+        "Runs the generated test and reports pass/fail before finishing"
+      ]
+    },
+    {
+      "skills": ["react-testing"],
+      "query": "Add tests for the formatCurrency utility function, it's pure logic in src/utils/format.ts",
+      "files": [
+        {
+          "path": "package.json",
+          "content": "{\"name\":\"fake-app\",\"dependencies\":{\"react\":\"^18.3.0\",\"react-dom\":\"^18.3.0\"},\"devDependencies\":{\"vitest\":\"^2.0.0\"}}"
+        },
+        {
+          "path": "src/utils/format.ts",
+          "content": "export function formatCurrency(cents: number, currency = 'USD'): string {\n  if (cents < 0) throw new Error('cents must be non-negative');\n  return new Intl.NumberFormat('en-US', { style: 'currency', currency }).format(cents / 100);\n}\n"
+        }
+      ],
+      "expected_behavior": [
+        "Classifies formatCurrency as pure unit-testable logic, generates a plain unit test with no rendering involved",
+        "Covers a happy-path case, a zero-cents boundary case, and the negative-input error-path case (throws)",
+        "Does not pull in React Testing Library or MSW for a function with no rendering and no network calls",
+        "Runs the fault-injection self-check from reference/verification.md: introduces a deliberate fault, confirms the test goes red, then reverts it",
+        "Reports back explicitly what was covered"
+      ]
+    },
+    {
+      "skills": ["react-testing"],
+      "query": "Test the UserProfile component which fetches user data from /api/users/:id and shows an error if the fetch fails",
+      "files": [
+        {
+          "path": "package.json",
+          "content": "{\"name\":\"fake-app\",\"dependencies\":{\"react\":\"^18.3.0\",\"react-dom\":\"^18.3.0\"},\"devDependencies\":{\"vitest\":\"^2.0.0\",\"@testing-library/react\":\"^16.0.0\",\"msw\":\"^2.3.0\"}}"
+        },
+        {
+          "path": "src/components/UserProfile.tsx",
+          "content": "// fetches /api/users/:id, renders name or an error message on failure\n"
+        }
+      ],
+      "expected_behavior": [
+        "Detects msw is already installed and uses it to intercept the network call rather than mocking fetch at the module level",
+        "Treats this as an integration test (component + real state + MSW-mocked network), not a heavily-mocked unit test",
+        "Includes both the success-path render and the error-path render (404/failure handler override) as separate test cases",
+        "Does not reach for a Playwright E2E test for this -- a component/integration test covers it",
+        "Runs the fault-injection self-check on the error-handling branch since it's a distinct logic path"
+      ]
+    },
+    {
+      "skills": ["react-testing"],
+      "query": "Write React Testing Library tests for my LoginButton component in my Next.js app",
+      "files": [
+        {
+          "path": "package.json",
+          "content": "{\"name\":\"fake-next-app\",\"dependencies\":{\"react\":\"^18.3.0\",\"react-dom\":\"^18.3.0\",\"next\":\"^15.0.0\"}}"
+        }
+      ],
+      "expected_behavior": [
+        "Does NOT proceed as react-testing -- scripts/detect_stack.sh (or equivalent reasoning from package.json) detects 'next' as a dependency and defers to nextjs-testing instead",
+        "Clearly states that this is a Next.js project and the nextjs-testing skill is the correct one, rather than silently generating a plain-React test"
+      ]
+    }
+  ]
+}
