@@ -19,7 +19,28 @@
         "Uses @Test and #expect (Swift Testing), not XCTestCase/XCTAssert, if no existing XCTest convention is found",
         "Flags authentication as a critical path requiring elevated rigor even though the user's request was general",
         "Covers invalid-email, short-password, and valid-input cases as separate test cases",
-        "Runs the mandatory fault-injection self-check from reference/verification.md on this business-logic test"
+        "Does NOT automatically run the fault-injection self-check from reference/verification.md -- the request only asked to write the tests, not to run or verify them",
+        "Reports the file written and what each test covers, then offers to run and verify (including the fault-injection check on this critical-path test) rather than executing anything unprompted"
+      ]
+    },
+    {
+      "skills": ["swift-testing"],
+      "query": "Write tests for LoginViewModel and run them so I know they actually catch bugs",
+      "files": [
+        {
+          "path": "FakeApp.xcodeproj/project.pbxproj",
+          "content": "// placeholder Xcode project file"
+        },
+        {
+          "path": "FakeApp/LoginViewModel.swift",
+          "content": "import SwiftUI\n\n@Observable\nfinal class LoginViewModel {\n    var email = \"\"\n    var password = \"\"\n    var errorMessage: String?\n\n    func submit() {\n        guard email.contains(\"@\") else {\n            errorMessage = \"Enter a valid email\"\n            return\n        }\n        guard password.count >= 8 else {\n            errorMessage = \"Password must be at least 8 characters\"\n            return\n        }\n        errorMessage = nil\n    }\n}\n"
+        }
+      ],
+      "expected_behavior": [
+        "Recognizes 'run them so I know they actually catch bugs' as an explicit request for verification and proceeds through Step 7",
+        "Actually runs the generated tests and confirms they pass",
+        "Runs the mandatory fault-injection self-check from reference/verification.md on this critical-path (authentication) test, confirms it goes red on a deliberate fault, then reverts the fault to its exact original state",
+        "Reports back what was covered and confirms the fault-injection check passed"
       ]
     },
     {
@@ -63,7 +84,7 @@
       "expected_behavior": [
         "Detects that XCTest already dominates the test target via scripts/detect_stack.sh and matches it -- generates XCTestCase/XCTAssert-style tests, not @Test/#expect, even though Swift Testing is this skill's default recommendation",
         "Covers a happy-path case, an empty-array boundary case, and a discount edge case",
-        "Runs the fault-injection self-check on this business-logic test",
+        "Does not automatically run the fault-injection self-check -- offers verification rather than running it unprompted, since the request only asked for the test to be written",
         "Does not introduce Swift Testing as a second, competing framework into a codebase that already consistently uses XCTest"
       ]
     },

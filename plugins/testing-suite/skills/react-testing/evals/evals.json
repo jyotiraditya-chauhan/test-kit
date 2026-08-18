@@ -19,7 +19,7 @@
         "Uses getByLabelText/getByRole (accessibility-tree query) rather than getByTestId, since SearchInput has an aria-label",
         "Uses @testing-library/user-event rather than fireEvent for the typing interaction",
         "States an explicit test plan before writing test code",
-        "Runs the generated test and reports pass/fail before finishing"
+        "Reports the file written and what each test covers, then offers to run and verify -- does NOT run the test or claim any pass/fail result unless asked"
       ]
     },
     {
@@ -39,8 +39,28 @@
         "Classifies formatCurrency as pure unit-testable logic, generates a plain unit test with no rendering involved",
         "Covers a happy-path case, a zero-cents boundary case, and the negative-input error-path case (throws)",
         "Does not pull in React Testing Library or MSW for a function with no rendering and no network calls",
-        "Runs the fault-injection self-check from reference/verification.md: introduces a deliberate fault, confirms the test goes red, then reverts it",
-        "Reports back explicitly what was covered"
+        "Does NOT automatically run the test or the fault-injection self-check -- the request only asked to add tests",
+        "Offers, without executing anything, to run the tests and verify with a fault-injection check"
+      ]
+    },
+    {
+      "skills": ["react-testing"],
+      "query": "Add tests for the formatCurrency utility function in src/utils/format.ts and run them to confirm they actually work",
+      "files": [
+        {
+          "path": "package.json",
+          "content": "{\"name\":\"fake-app\",\"dependencies\":{\"react\":\"^18.3.0\",\"react-dom\":\"^18.3.0\"},\"devDependencies\":{\"vitest\":\"^2.0.0\"}}"
+        },
+        {
+          "path": "src/utils/format.ts",
+          "content": "export function formatCurrency(cents: number, currency = 'USD'): string {\n  if (cents < 0) throw new Error('cents must be non-negative');\n  return new Intl.NumberFormat('en-US', { style: 'currency', currency }).format(cents / 100);\n}\n"
+        }
+      ],
+      "expected_behavior": [
+        "Since the user explicitly asked to run and confirm the tests work, proceeds through Step 7 without a separate confirmation round-trip",
+        "Actually runs the generated tests and confirms they pass",
+        "Runs the fault-injection self-check from reference/verification.md: introduces a deliberate fault, confirms the test goes red, then reverts it to its exact original state",
+        "Reports back explicitly what was covered and confirms the fault-injection check passed"
       ]
     },
     {
@@ -61,7 +81,7 @@
         "Treats this as an integration test (component + real state + MSW-mocked network), not a heavily-mocked unit test",
         "Includes both the success-path render and the error-path render (404/failure handler override) as separate test cases",
         "Does not reach for a Playwright E2E test for this -- a component/integration test covers it",
-        "Runs the fault-injection self-check on the error-handling branch since it's a distinct logic path"
+        "Does not automatically run the fault-injection self-check -- the request only asked to test the component; offers verification rather than running it unprompted"
       ]
     },
     {

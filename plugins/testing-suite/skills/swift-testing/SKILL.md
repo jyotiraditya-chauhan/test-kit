@@ -14,11 +14,15 @@ paths:
 
 # Swift / SwiftUI Testing
 
-Generates unit, view-model, and snapshot tests for Swift/SwiftUI projects.
+Writes unit, view-model, and snapshot tests for Swift/SwiftUI projects.
 The central pattern: SwiftUI has no public view-tree introspection, so
 business logic is tested via the view model, not the view — see
 [reference/view-model-testing.md](reference/view-model-testing.md) before
-generating anything against a view file directly.
+generating anything against a view file directly. **Writing the test files
+is the deliverable.** Running the suite and verifying it — including the
+fault-injection self-check — is a separate, optional step this skill
+offers but never runs without being asked. See
+[Step 6](#step-6--report-what-was-written-then-offer-to-verify).
 
 ## Progress checklist
 
@@ -30,8 +34,8 @@ Copy this into your response and check items off as you go:
 - [ ] 3. Ask the user what to test (layer + scope) — do not assume
 - [ ] 4. State the test plan explicitly
 - [ ] 5. Generate tests following AAA, boundary-only mocking/fakes
-- [ ] 6. Run tests; fault-injection self-check on business-logic tests
-- [ ] 7. Report back honestly: covered, not covered, anything rewritten
+- [ ] 6. Report what was written; offer to run + verify — do not run yet
+- [ ] 7. Only if asked: run tests, fault-injection self-check, report results
 ```
 
 ## Step 1 — Detect stack
@@ -110,7 +114,26 @@ redirect before any code exists.
   isn't obvious from the test name and code itself. Do not narrate what
   each line does.
 
-## Step 6 — Self-verification (mandatory)
+## Step 6 — Report what was written, then offer to verify
+
+This step always happens, and on its own it completes the task. List the
+file(s) written or edited, and for each test summarize in one line what it
+covers (happy path / boundary / error path / interaction). Do **not** run
+the tests yet and do **not** claim anything passed — nothing has been
+executed.
+
+Then offer, in the same message, without running anything automatically:
+*"Want me to run these and verify them — including a fault-injection check
+on the business-logic tests — before you review them?"*
+
+If the user doesn't ask for verification (here or in a later message), the
+task is complete. Never silently run the suite anyway, and never present a
+pass/fail claim for tests that were not actually executed.
+
+## Step 7 — Only if the user asks: run and verify
+
+Do this only when the user explicitly asks you to run, verify, or check
+the tests — in this turn or a follow-up one.
 
 1. Run the new test(s) against the real implementation. Confirm green. A
    test that's red against correct code is a wrong test — fix the test, do
@@ -118,25 +141,23 @@ redirect before any code exists.
 2. For every business-logic or critical-path test (view models,
    authentication, payment logic): run the fault-injection self-check in
    [reference/verification.md](reference/verification.md) exactly as
-   written. Any test that stays green against deliberately broken code
-   must be rewritten before being counted as passing coverage.
+   written — mandatory within this verification pass, not optional. Any
+   test that stays green against deliberately broken code must be
+   rewritten before being counted as passing coverage.
 3. Check for accidental non-determinism: real network calls, an on-disk
    store instead of an in-memory one, unpinned simulator/locale/timezone
    affecting a snapshot, order-dependence on other tests. Fix in place.
-
-## Step 7 — Report back
-
-Summarize specifically: which layer(s) were tested, which edge cases were
-covered, what was intentionally left out of scope and why, whether any test
-was flagged and rewritten during Step 6, and the coverage delta if
-measurable. Never claim "fully tested" or "all done" without this detail.
+4. Report specifically: which layer(s) were run, which edge cases were
+   covered, what was intentionally left out of scope and why, whether any
+   test was flagged and rewritten, and the coverage delta if measurable.
+   Never claim "fully tested" or "all done" without this detail.
 
 ## Reference
 
 - Swift Testing vs XCTest, translation table, coexistence rules: [reference/swift-testing-vs-xctest.md](reference/swift-testing-vs-xctest.md)
 - View-model-first testing pattern, ViewInspector as secondary, async/Combine: [reference/view-model-testing.md](reference/view-model-testing.md)
 - swift-snapshot-testing usage and scope, in-memory Core Data/SwiftData: [reference/snapshot-and-persistence.md](reference/snapshot-and-persistence.md)
-- Fault-injection self-check procedure (mandatory, follow verbatim): [reference/verification.md](reference/verification.md)
+- Fault-injection self-check procedure — run only if the user asks for verification, follow verbatim when you do: [reference/verification.md](reference/verification.md)
 
 ## Scripts
 

@@ -38,7 +38,27 @@
         "Tests createOrder as a plain async function via Vitest, not through a rendered component tree",
         "Flags this as a critical/data-write path (order creation) requiring elevated rigor even though the user's request was narrower",
         "Covers a valid-input happy path, an invalid-input case (zod validation failure), and a boundary case (quantity <= 0)",
-        "Runs the mandatory fault-injection self-check from reference/verification.md on this business-logic test",
+        "Does NOT automatically run the test or the fault-injection self-check -- the request only asked to test the action, not to run or verify it",
+        "Reports the file written and what each test covers, then offers to run and verify (including the fault-injection check) rather than executing anything unprompted"
+      ]
+    },
+    {
+      "skills": ["nextjs-testing"],
+      "query": "Test the createOrder Server Action in app/actions/order.ts and run the tests to make sure they actually catch bugs",
+      "files": [
+        {
+          "path": "package.json",
+          "content": "{\"name\":\"fake-next\",\"dependencies\":{\"react\":\"^18.3.0\",\"react-dom\":\"^18.3.0\",\"next\":\"^15.0.0\",\"zod\":\"^3.23.0\"},\"devDependencies\":{\"vitest\":\"^2.0.0\"}}"
+        },
+        {
+          "path": "app/actions/order.ts",
+          "content": "'use server';\nimport { z } from 'zod';\n\nconst OrderSchema = z.object({ itemId: z.string(), quantity: z.number().positive() });\n\nexport async function createOrder(input: unknown) {\n  const parsed = OrderSchema.parse(input);\n  // ...write to database\n  return { id: 'order_1', ...parsed };\n}\n"
+        }
+      ],
+      "expected_behavior": [
+        "Recognizes 'run the tests to make sure they actually catch bugs' as an explicit request for verification and proceeds through Step 7",
+        "Actually runs the generated tests and confirms they pass against the real implementation",
+        "Runs the mandatory fault-injection self-check from reference/verification.md on this business-logic/critical-path test, confirms it goes red on a deliberate fault, then reverts the fault",
         "Reports back what was covered and confirms the fault-injection check passed"
       ]
     },
