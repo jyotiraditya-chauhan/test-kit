@@ -1,9 +1,11 @@
 # Fault-Injection Self-Check
 
-This is a mandatory, low-freedom procedure. Follow it exactly, in this
-order, for every business-logic or critical-path test (auth, payment,
-any data-write path) generated this session. Do not skip steps, do not
-substitute your own variation, do not summarize it away.
+Run this procedure only when the user has asked you to run or verify the
+tests (SKILL.md Step 7) — it is never triggered automatically just because
+tests were generated. Once triggered, it is a mandatory, low-freedom
+procedure: follow it exactly, in this order, for every business-logic or
+critical-path test (auth, payment, any data-write path) in scope. Do not
+skip steps, do not substitute your own variation, do not summarize it away.
 
 Why this exists: code coverage measures which lines executed, not whether
 the test actually verifies anything. It is common for a generated test to
@@ -42,15 +44,20 @@ catches that failure mode in seconds, with no extra tooling.
    GREEN again against the real, correct implementation.
 
 6. Record which tests were fault-injection-checked and whether any were
-   rewritten as a result, for the Step 7 report back to the user.
+   rewritten as a result, for the report back to the user at the end of
+   Step 7.
 
 ## Non-negotiable rules
 
+- Never run this procedure unless the user asked for verification. Writing
+  the test is the deliverable on its own; this is an add-on, not a
+  default.
 - Never leave the deliberate fault in the implementation file. Step 5 is not
   optional.
 - Never delete or disable a test to make it pass. A test that fails against
   correct code gets fixed, not removed. A test that passes against broken
   code gets rewritten, not accepted.
-- Apply this to business-logic and critical-path tests always. For pure
-  UI-rendering assertions (e.g. "this text is present"), it is optional —
-  note in the Step 7 report if it was skipped and why.
+- Once verification has been triggered, apply this to business-logic and
+  critical-path tests always. For pure UI-rendering assertions (e.g. "this
+  text is present"), it is optional within that pass — note in the report
+  if it was skipped and why.
