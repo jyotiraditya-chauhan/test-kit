@@ -1,4 +1,4 @@
-# test-kit
+# Test-kit
 
 **A Claude Code plugin marketplace for stack-aware test writing.**
 
