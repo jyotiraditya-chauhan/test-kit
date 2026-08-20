@@ -3,6 +3,7 @@
 Table of contents:
 - [Scope: primitives, not screens](#scope-primitives-not-screens)
 - [Basic pattern](#basic-pattern)
+- [Alchemist for multi-scenario goldens](#alchemist-for-multi-scenario-goldens)
 - [Flakiness causes and fixes](#flakiness-causes-and-fixes)
 - [Updating goldens](#updating-goldens)
 
@@ -30,6 +31,43 @@ testWidgets('PrimaryButton matches golden', (tester) async {
   );
 });
 ```
+
+## Alchemist for multi-scenario goldens
+
+The bare `matchesGoldenFile` pattern above needs no extra dependency and
+is fine for a single component in a single state. When a component has
+several meaningfully different states worth a golden each (default,
+disabled, error, dark mode), prefer **Alchemist** over hand-rolling
+several near-duplicate `testWidgets` blocks -- it groups scenarios into
+one file with less boilerplate and handles font-loading consistency for
+you:
+
+```dart
+import 'package:alchemist/alchemist.dart';
+
+goldenTest(
+  'PrimaryButton matches golden',
+  fileName: 'primary_button',
+  builder: () => GoldenTestGroup(
+    children: [
+      GoldenTestScenario(
+        name: 'default',
+        child: PrimaryButton(label: 'Continue', onPressed: () {}),
+      ),
+      GoldenTestScenario(
+        name: 'disabled',
+        child: PrimaryButton(label: 'Continue', onPressed: null),
+      ),
+    ],
+  ),
+);
+```
+
+If the project already has `golden_toolkit` in `pubspec.yaml`, match it
+rather than introducing Alchemist as a second golden-test dependency --
+`golden_toolkit` is discontinued (no longer published) but existing
+tests using it keep working. Only propose Alchemist for a project with
+neither package yet.
 
 ## Flakiness causes and fixes
 

@@ -3,6 +3,7 @@
 Table of contents:
 - [The standard pattern](#the-standard-pattern)
 - [Never call .listen() for tests](#never-call-listen-for-tests)
+- [Fastify projects: fastify.inject()](#fastify-projects-fastifyinject)
 - [Runner choice](#runner-choice)
 
 ## The standard pattern
@@ -40,6 +41,25 @@ exported app has already started listening as a side effect of import.
 can confirm they're the app's own bootstrap entrypoint, not something a
 test triggers. See [test-isolation.md](test-isolation.md) for why this
 matters under parallel test workers.
+
+## Fastify projects: fastify.inject()
+
+For a Fastify app specifically, `app.inject()` (built into Fastify
+itself, no extra dependency) is an equally valid alternative to
+Supertest -- it dispatches the request through Fastify's routing
+internally without any real HTTP encoding overhead:
+
+```js
+test('returns 401 without an auth token', async () => {
+  const res = await app.inject({ method: 'GET', url: '/api/users/me' });
+  expect(res.statusCode).toBe(401);
+});
+```
+
+This isn't a default change -- if the project already uses Supertest
+against a Fastify app, keep using Supertest rather than introducing a
+second HTTP-testing approach. Only reach for `inject()` on a new Fastify
+test setup with no existing convention yet.
 
 ## Runner choice
 

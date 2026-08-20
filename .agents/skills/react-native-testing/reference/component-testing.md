@@ -39,6 +39,11 @@ For Expo (managed or bare), the preset is `jest-expo`:
 
 `scripts/detect_stack.sh` reports which preset, if any, is already
 configured. Match it; do not switch presets on an existing project.
+`jest-expo/universal` also exists (runs the same suite across iOS/
+Android/web/Node with per-platform snapshots) -- it's a real, current
+option but changes snapshot behavior in a way that could surprise an
+existing project, so only propose it if the user specifically wants
+multi-platform coverage, not as a silent default upgrade.
 
 ## Query priority
 
@@ -56,13 +61,21 @@ Preferred order:
 import { render, screen, fireEvent } from '@testing-library/react-native';
 import { LoginButton } from './LoginButton';
 
-it('calls onPress when tapped', () => {
+it('calls onPress when tapped', async () => {
   const onPress = jest.fn();
-  render(<LoginButton onPress={onPress} />);
-  fireEvent.press(screen.getByRole('button', { name: /log in/i }));
+  await render(<LoginButton onPress={onPress} />);
+  await fireEvent.press(screen.getByRole('button', { name: /log in/i }));
   expect(onPress).toHaveBeenCalledTimes(1);
 });
 ```
+
+On `@testing-library/react-native` v14+ (current stable), `render`,
+`renderHook`, `fireEvent`, and `act` all return Promises and must be
+awaited, as shown above -- an un-awaited call can leave assertions
+racing the update it depends on. Older versions (pre-v14) are
+synchronous and don't need the `await`. Match whatever major version is
+already installed per Step 1; don't force an upgrade to add `await`
+calls to an existing test suite that hasn't migrated.
 
 ## Async state and interaction
 
@@ -74,7 +87,7 @@ store dispatch or timer advance does not).
 
 ```tsx
 it('shows the loaded profile name after fetch resolves', async () => {
-  render(<ProfileScreen userId="42" />);
+  await render(<ProfileScreen userId="42" />);
   expect(await screen.findByText('Ada Lovelace')).toBeTruthy();
 });
 ```

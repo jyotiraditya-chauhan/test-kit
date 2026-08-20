@@ -23,6 +23,13 @@ beforeAll(async () => {
 afterAll(async () => container.stop());
 ```
 
+testcontainers v12+ defaults to waiting on the image's Docker healthcheck
+when one exists, falling back to port-listening only if the image
+doesn't define one -- no action needed for most images. If a project
+pins an image with no healthcheck and needs the old behavior explicitly,
+`.withWaitStrategy(Wait.forListeningPorts())` before `.start()` restores
+it.
+
 Most teams over-invest effort in the E2E layer and under-invest in this
 specific testcontainers-backed integration layer. Actively recommend it
 for anything genuinely database-behavior-dependent (a real query, a real
@@ -35,10 +42,11 @@ For verifying that an API's actual request/response shape matches what
 consumers (a frontend, or another service) expect, without running the
 full consumer: Pact (consumer-driven contracts, with a Pact Broker for
 sharing contracts between teams/repos) or direct OpenAPI-spec validation
-(tools like Dredd) that assert real responses conform to a published
-schema. Only propose this if the project already has cross-repo/external
-consumers, or the user explicitly asks. It's a separate concern from
-ordinary route testing, not a default addition to every test plan.
+(Schemathesis, which generates and runs property-based test cases from a
+published OpenAPI schema) that asserts real responses conform to it. Only
+propose this if the project already has cross-repo/external consumers,
+or the user explicitly asks. It's a separate concern from ordinary route
+testing, not a default addition to every test plan.
 
 ## Coverage targets
 

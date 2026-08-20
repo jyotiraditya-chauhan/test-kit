@@ -28,8 +28,8 @@ behave as they would in the real app. It accepts three forms:
 ```tsx
 import { renderRouter, screen } from 'expo-router/testing-library';
 
-it('renders the profile screen for a given id', () => {
-  renderRouter(
+it('renders the profile screen for a given id', async () => {
+  await renderRouter(
     {
       'app/_layout': () => null,
       'app/profile/[id]': require('../app/profile/[id]').default,
@@ -39,6 +39,11 @@ it('renders the profile screen for a given id', () => {
   expect(screen.getByText(/profile 42/i)).toBeTruthy();
 });
 ```
+
+`renderRouter` is built on RNTL's `render`, so on `@testing-library/react-native`
+v14+ it also returns a Promise and needs the `await` shown above — see
+[component-testing.md](component-testing.md)'s RNTL v14+ note. Drop it
+for a project on an older RNTL major.
 
 **Array of route-name strings** — when only route presence/navigation
 matters, not full component output:
@@ -82,8 +87,8 @@ when accessed directly (e.g. an auth-gated screen hit via deep link while
 logged out):
 
 ```tsx
-it('redirects to login when a protected route is opened while logged out', () => {
-  renderRouter(
+it('redirects to login when a protected route is opened while logged out', async () => {
+  await renderRouter(
     { 'app/_layout': () => null, 'app/(protected)/settings': Settings },
     { initialUrl: '/settings' }
   );

@@ -22,8 +22,22 @@ target, match it rather than introducing the other.
 | `XCTAssertFalse(condition)` | `#expect(!condition)` |
 | `XCTAssertNil(value)` | `#expect(value == nil)` |
 | `XCTAssertNotNil(value)` | `#expect(value != nil)` |
-| `XCTAssertThrowsError(try f())` | `#expect(throws: Error.self) { try f() }` |
+| `XCTAssertThrowsError(try f()) { error in ... }` | `let error = #expect(throws: SomeError.self) { try f() }` |
 | `class MyTests: XCTestCase { func testX() {...} }` | `@Test func x() { #expect(...) }` |
+
+Prefer the return-value form of `#expect(throws:)` (stable since Swift
+6.1) over the older bare `#expect(throws: Error.self) { try f() }`: the
+bare form only confirms *something* threw, which is exactly the kind of
+weak, non-specific assertion the Step 5 self-review rule flags. The
+return-value form lets a test assert on the thrown error's actual type
+and payload in one line:
+
+```swift
+let error = #expect(throws: PricingError.self) {
+    try service.calculateTotal(items: [])
+}
+#expect(error?.code == .emptyCart)
+```
 
 Swift Testing also supports human-readable test names and built-in
 parameterization:

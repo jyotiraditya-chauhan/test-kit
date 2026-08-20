@@ -37,6 +37,24 @@ Use `ProviderContainer` with `overrides`. This runs completely headless,
 with no widget tree required, which is why Riverpod tests average 30-40%
 fewer lines than the equivalent BLoC test for the same behavior.
 
+On Riverpod 3.0+, prefer `ProviderContainer.test()` -- it auto-disposes
+at the end of the test, so there's no separate teardown call to forget:
+
+```dart
+test('returns the user', () async {
+  final container = ProviderContainer.test(
+    overrides: [userRepositoryProvider.overrideWithValue(mockRepo)],
+  );
+  final result = await container.read(userProvider.future);
+  expect(result, expectedUser);
+});
+```
+
+If the project is pinned to Riverpod 2.x (`ProviderContainer.test()`
+doesn't exist yet), use the manual form instead and always
+`addTearDown(container.dispose)` explicitly -- a leaked container across
+tests is a shared-mutable-state flakiness cause (see `verification.md`):
+
 ```dart
 final container = ProviderContainer(
   overrides: [userRepositoryProvider.overrideWithValue(mockRepo)],
@@ -47,8 +65,12 @@ final result = await container.read(userProvider.future);
 expect(result, expectedUser);
 ```
 
-Always `addTearDown(container.dispose)`. A leaked container across tests is
-a shared-mutable-state flakiness cause (see `verification.md`).
+On Riverpod 3, a `Notifier`/`AsyncNotifier` is reconstructed on every
+rebuild rather than persisting as a pseudo-singleton -- if a test assumes
+the same notifier instance survives across multiple provider reads (e.g.
+to check an internal timer or controller it owns), verify that
+assumption against the project's actual Riverpod version rather than
+carrying it over from Riverpod 2 habits.
 
 ## Provider
 

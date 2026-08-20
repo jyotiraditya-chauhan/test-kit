@@ -12,7 +12,7 @@ tests.
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![Plugin](https://img.shields.io/badge/Claude%20Code-Plugin-5A45FF.svg)](https://code.claude.com/docs/en/plugins)
-[![Version](https://img.shields.io/badge/version-2.2.0-blue.svg)](plugins/testing-suite/.claude-plugin/plugin.json)
+[![Version](https://img.shields.io/badge/version-2.3.0-blue.svg)](plugins/testing-suite/.claude-plugin/plugin.json)
 [![Skills](https://img.shields.io/badge/skills-6-informational.svg)](#the-six-skills)
 
 ---
@@ -121,7 +121,7 @@ if you also want them executed and fault-injection-checked.
 
 | Skill | Command | Fires on | Default stack |
 |---|---|---|---|
-| **flutter-testing** | `/testing-suite:flutter-testing` | `pubspec.yaml` with a `flutter:` SDK dependency | `flutter_test`, `mocktail`, `bloc_test` / `ProviderContainer`, `golden_toolkit`, `integration_test` / Patrol |
+| **flutter-testing** | `/testing-suite:flutter-testing` | `pubspec.yaml` with a `flutter:` SDK dependency | `flutter_test`, `mocktail`, `bloc_test` / `ProviderContainer`, Alchemist, `integration_test` / Patrol |
 | **react-testing** | `/testing-suite:react-testing` | `package.json` with `react`+`react-dom`, no `next`, no `react-native` | Vitest/Jest, React Testing Library, MSW |
 | **nextjs-testing** | `/testing-suite:nextjs-testing` | `package.json` with `next` | Vitest (Server Actions, sync components) + Playwright (async Server Components, auth, checkout) |
 | **react-native-testing** | `/testing-suite:react-native-testing` | `package.json` with `react-native` (Expo managed, Expo bare, or plain RN CLI) | Jest (`jest-expo` or the `react-native` preset), React Native Testing Library, Maestro or Detox for E2E |
@@ -146,7 +146,7 @@ folded into a generic "widget testing" default:
 |---|---|---|---|
 | **Unit** | Pure Dart logic: services, repositories, formatters, validators. No widget tree. | `package:test`, `mocktail` | [`reference/unit-testing.md`](plugins/testing-suite/skills/flutter-testing/reference/unit-testing.md) |
 | **Widget** | A single widget or small tree: rendering, interaction, layout. | `flutter_test`, `WidgetTester` | [`reference/widget-testing.md`](plugins/testing-suite/skills/flutter-testing/reference/widget-testing.md) |
-| **Golden** | Pixel-level visual regression for small, stable design-system components. | `golden_toolkit` / `alchemist` | [`reference/golden-tests.md`](plugins/testing-suite/skills/flutter-testing/reference/golden-tests.md) |
+| **Golden** | Pixel-level visual regression for small, stable design-system components. | Alchemist (`golden_toolkit` matched if a project already has it -- it's discontinued, not recommended for new setups) | [`reference/golden-tests.md`](plugins/testing-suite/skills/flutter-testing/reference/golden-tests.md) |
 | **Integration** | Full app on a real device or emulator, Flutter's closest thing to E2E. Reserved for critical flows. | `integration_test`, Patrol for native-OS interactions | [`reference/integration-testing.md`](plugins/testing-suite/skills/flutter-testing/reference/integration-testing.md) |
 
 There are also cross-cutting reference docs that apply across all four
@@ -321,7 +321,7 @@ critical.
 plugins/
   testing-suite/
     .claude-plugin/
-      plugin.json                # plugin manifest (v2.2.0)
+      plugin.json                # plugin manifest (v2.3.0)
     portable/
       AGENTS.md                  # condensed fragment for tools with no
                                   # skills system (Aider, Windsurf, etc.)
@@ -416,6 +416,20 @@ SmartBear software-leader survey, both referenced in that research base.
 
 ## Version history
 
+- **2.3.0**: Currency audit. Three parallel research passes checked every
+  platform's guidance against current (Aug 2026) documented behavior.
+  Headline fix: Next.js has required `params`/`searchParams` to be
+  awaited as Promises since v15 (Next.js is now at 16.3), and the
+  `nextjs-testing` reference docs still showed the old synchronous
+  shape -- fixed. Also: Flutter's golden-test guidance now recommends
+  Alchemist (`golden_toolkit`, which it supersedes, is confirmed
+  discontinued), Riverpod's `ProviderContainer.test()` is the new default
+  pattern, Swift's `#expect(throws:)` example now uses the
+  return-value form, React Native's RNTL v14+ async `render`/`fireEvent`
+  API is reflected, and Node's contract-testing guidance swaps the
+  stalled Dredd for Schemathesis. Everything else in all six skills was
+  confirmed still accurate as-is -- this was a targeted correction pass,
+  not a rewrite.
 - **2.2.0**: Quality and portability pass. Every skill now does a free
   assertion-strength self-review before reporting (Step 5), runs new
   tests at least twice before considering them green when verification

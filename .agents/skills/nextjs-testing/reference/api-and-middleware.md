@@ -18,10 +18,17 @@ import { GET } from '@/app/api/users/[id]/route';
 
 test('returns 404 for an unknown user', async () => {
   const req = new Request('http://localhost/api/users/unknown');
-  const res = await GET(req, { params: { id: 'unknown' } });
+  // Next.js 15+: context.params is a Promise, not a plain object.
+  const res = await GET(req, { params: Promise.resolve({ id: 'unknown' }) });
   expect(res.status).toBe(404);
 });
 ```
+
+`cookies()`, `headers()`, and `draftMode()` from `next/headers` are also
+async now (Next.js 15+). A test stub for any of them must return a
+Promise, not a plain object -- `vi.mock('next/headers', () => ({ cookies: () => Promise.resolve({ get: () => undefined }) }))`,
+not a synchronous stub. A synchronous stub breaks silently at the
+`await cookies()` call site inside the code under test.
 
 ## Middleware
 

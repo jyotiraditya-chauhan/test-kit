@@ -58,3 +58,10 @@ const { result } = renderHook(() => useCounter());
 act(() => result.current.increment());
 expect(result.current.count).toBe(1);
 ```
+
+On React 19, `act` is exported from `react` itself, not
+`react-dom/test-utils` (which no longer exports it). RTL's own
+`render`/`renderHook`/`fireEvent`/`user-event` already wrap this
+correctly internally, so this only matters if a project has older,
+hand-rolled test utilities importing `act` from the old path -- those
+will break on a React 19 upgrade and need the import path updated.

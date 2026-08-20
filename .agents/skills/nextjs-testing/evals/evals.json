@@ -10,7 +10,7 @@
         },
         {
           "path": "app/users/[id]/page.tsx",
-          "content": "export default async function UserPage({ params }: { params: { id: string } }) {\n  const res = await fetch(`http://localhost/api/users/${params.id}`);\n  const user = await res.json();\n  return <div>{user.name}</div>;\n}\n"
+          "content": "export default async function UserPage({ params }: { params: Promise<{ id: string }> }) {\n  const { id } = await params;\n  const res = await fetch(`http://localhost/api/users/${id}`);\n  const user = await res.json();\n  return <div>{user.name}</div>;\n}\n"
         }
       ],
       "expected_behavior": [

@@ -42,8 +42,15 @@ export async function getUser(id: string) {
 // thin; Playwright covers this file, Vitest covers get-user.ts directly.
 import { getUser } from '@/data/get-user';
 
-export default async function UserPage({ params }: { params: { id: string } }) {
-  const user = await getUser(params.id);
+// Next.js 15+: params is a Promise, not a plain object -- await it before
+// use. This applies to every App Router page/layout, not just this example.
+export default async function UserPage({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
+  const { id } = await params;
+  const user = await getUser(id);
   return <div>{user.name}</div>;
 }
 ```

@@ -19,6 +19,14 @@ free — Expo SDK modules aren't relevant there, but the same pattern
 applies to community native modules (`react-native-camera`, and similar):
 mock at the module boundary, not deeper.
 
+Jest itself always runs in Node, never on a device or simulator, so it
+never exercises Fabric or TurboModules regardless of whether the New
+Architecture is enabled (default since RN 0.76+/Expo SDK 52+) — this
+mocking approach is unaffected by which architecture the project is on.
+New Architecture's real testing implications (synchronous rendering
+shifting `useLayoutEffect`/animation timing) only surface at the E2E
+layer, not here.
+
 ## Mocking a custom or unmocked native module
 
 When a native module isn't auto-mocked (a custom native module, or an
@@ -69,8 +77,8 @@ import * as Clipboard from 'expo-clipboard';
 jest.mock('expo-clipboard');
 
 it('copies the share link when the copy button is pressed', async () => {
-  render(<ShareLinkButton link="https://example.com/x" />);
-  fireEvent.press(screen.getByRole('button', { name: /copy link/i }));
+  await render(<ShareLinkButton link="https://example.com/x" />);
+  await fireEvent.press(screen.getByRole('button', { name: /copy link/i }));
   await waitFor(() =>
     expect(Clipboard.setStringAsync).toHaveBeenCalledWith(
       'https://example.com/x'
@@ -82,12 +90,14 @@ it('shows an error state if the clipboard write fails', async () => {
   (Clipboard.setStringAsync as jest.Mock).mockRejectedValueOnce(
     new Error('permission denied')
   );
-  render(<ShareLinkButton link="https://example.com/x" />);
-  fireEvent.press(screen.getByRole('button', { name: /copy link/i }));
+  await render(<ShareLinkButton link="https://example.com/x" />);
+  await fireEvent.press(screen.getByRole('button', { name: /copy link/i }));
   expect(await screen.findByText(/couldn't copy/i)).toBeTruthy();
 });
 ```
 
 This is boundary-only mocking applied to native modules specifically: the
 component's own logic runs for real, only the native call underneath it is
-faked.
+faked. (`render`/`fireEvent` shown awaited here per
+[component-testing.md](component-testing.md)'s RNTL v14+ note — drop the
+`await` for a project on an older RNTL major.)
