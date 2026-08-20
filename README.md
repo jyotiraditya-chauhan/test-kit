@@ -2,17 +2,18 @@
 
 **A Claude Code plugin marketplace for stack-aware test writing.**
 
-`test-kit` hosts **testing-suite**, one plugin bundling five platform skills:
-Flutter, React, Next.js, Swift/SwiftUI, and Node/Express. Each one detects a
-project's real stack and conventions, asks before assuming what to test, and
-writes tests that follow the project's own style. Flutter gets the deepest
-coverage of the five. Unit, widget, golden, and integration tests are each
-treated as first-class, not an afterthought behind widget tests.
+`test-kit` hosts **testing-suite**, one plugin bundling six platform skills:
+Flutter, React, Next.js, React Native/Expo, Swift/SwiftUI, and Node/Express.
+Each one detects a project's real stack and conventions, asks before assuming
+what to test, and writes tests that follow the project's own style. Flutter
+gets the deepest coverage of the six. Unit, widget, golden, and integration
+tests are each treated as first-class, not an afterthought behind widget
+tests.
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![Plugin](https://img.shields.io/badge/Claude%20Code-Plugin-5A45FF.svg)](https://code.claude.com/docs/en/plugins)
-[![Version](https://img.shields.io/badge/version-2.0.0-blue.svg)](plugins/testing-suite/.claude-plugin/plugin.json)
-[![Skills](https://img.shields.io/badge/skills-5-informational.svg)](#the-five-skills)
+[![Version](https://img.shields.io/badge/version-2.4.0-blue.svg)](plugins/testing-suite/.claude-plugin/plugin.json)
+[![Skills](https://img.shields.io/badge/skills-6-informational.svg)](#the-six-skills)
 
 ---
 
@@ -92,7 +93,8 @@ claude plugin install testing-suite@test-kit-marketplace
 ## Usage
 
 Just ask. The matching skill triggers automatically from your project's
-manifest files (`pubspec.yaml`, `package.json`, `.xcodeproj`, `next.config.*`):
+manifest files (`pubspec.yaml`, `package.json`, `.xcodeproj`, `next.config.*`,
+a `react-native` dependency):
 
 ```
 Write widget tests for my LoginButton widget
@@ -106,6 +108,7 @@ Or invoke a skill directly, namespaced under the plugin:
 /testing-suite:flutter-testing
 /testing-suite:react-testing
 /testing-suite:nextjs-testing
+/testing-suite:react-native-testing
 /testing-suite:swift-testing
 /testing-suite:node-testing
 ```
@@ -114,13 +117,14 @@ By default you'll get the test files and a summary of what each test
 covers. Add "and run them" or "and verify they work" to the same request
 if you also want them executed and fault-injection-checked.
 
-## The five skills
+## The six skills
 
 | Skill | Command | Fires on | Default stack |
 |---|---|---|---|
-| **flutter-testing** | `/testing-suite:flutter-testing` | `pubspec.yaml` with a `flutter:` SDK dependency | `flutter_test`, `mocktail`, `bloc_test` / `ProviderContainer`, `golden_toolkit`, `integration_test` / Patrol |
-| **react-testing** | `/testing-suite:react-testing` | `package.json` with `react`+`react-dom`, no `next` | Vitest/Jest, React Testing Library, MSW |
+| **flutter-testing** | `/testing-suite:flutter-testing` | `pubspec.yaml` with a `flutter:` SDK dependency | `flutter_test`, `mocktail`, `bloc_test` / `ProviderContainer`, Alchemist, `integration_test` / Patrol |
+| **react-testing** | `/testing-suite:react-testing` | `package.json` with `react`+`react-dom`, no `next`, no `react-native` | Vitest/Jest, React Testing Library, MSW |
 | **nextjs-testing** | `/testing-suite:nextjs-testing` | `package.json` with `next` | Vitest (Server Actions, sync components) + Playwright (async Server Components, auth, checkout) |
+| **react-native-testing** | `/testing-suite:react-native-testing` | `package.json` with `react-native` (Expo managed, Expo bare, or plain RN CLI) | Jest (`jest-expo` or the `react-native` preset), React Native Testing Library, Maestro or Detox for E2E |
 | **swift-testing** | `/testing-suite:swift-testing` | `.xcodeproj` / `.xcworkspace` / `Package.swift` | Swift Testing (`@Test`/`#expect`), XCTest where it already exists, `swift-snapshot-testing` |
 | **node-testing** | `/testing-suite:node-testing` | `package.json` with `express`/`fastify`/`koa`/`@nestjs/core` | Supertest against the app instance, Vitest/Jest, testcontainers |
 
@@ -142,7 +146,7 @@ folded into a generic "widget testing" default:
 |---|---|---|---|
 | **Unit** | Pure Dart logic: services, repositories, formatters, validators. No widget tree. | `package:test`, `mocktail` | [`reference/unit-testing.md`](plugins/testing-suite/skills/flutter-testing/reference/unit-testing.md) |
 | **Widget** | A single widget or small tree: rendering, interaction, layout. | `flutter_test`, `WidgetTester` | [`reference/widget-testing.md`](plugins/testing-suite/skills/flutter-testing/reference/widget-testing.md) |
-| **Golden** | Pixel-level visual regression for small, stable design-system components. | `golden_toolkit` / `alchemist` | [`reference/golden-tests.md`](plugins/testing-suite/skills/flutter-testing/reference/golden-tests.md) |
+| **Golden** | Pixel-level visual regression for small, stable design-system components. | Alchemist (`golden_toolkit` matched if a project already has it -- it's discontinued, not recommended for new setups) | [`reference/golden-tests.md`](plugins/testing-suite/skills/flutter-testing/reference/golden-tests.md) |
 | **Integration** | Full app on a real device or emulator, Flutter's closest thing to E2E. Reserved for critical flows. | `integration_test`, Patrol for native-OS interactions | [`reference/integration-testing.md`](plugins/testing-suite/skills/flutter-testing/reference/integration-testing.md) |
 
 There are also cross-cutting reference docs that apply across all four
@@ -187,22 +191,35 @@ is the operational backbone documented in each `SKILL.md`:
                               (unit/widget/integration/...), and which
                               scope (whole app, one feature, or specific
                               files). Never inferred silently.
-4. State the plan          -> what's in scope, what's mocked vs real, and
-                              the specific edge cases, before any code
-                              exists. The checkpoint to redirect.
+4. State the plan          -> what's in scope, what's mocked vs real, the
+                              specific edge cases, before any code exists.
+                              For a large scope, proposes a batched plan
+                              instead of attempting everything at once.
 5. Generate                -> AAA structure, boundary-only mocking,
-                              matches the project's existing style,
-                              minimal comments.
+                              matches the project's existing style. One
+                              header comment per file stating what it
+                              covers; inline comments only when genuinely
+                              necessary. Then a free self-review: every
+                              assertion just written gets re-read and
+                              strengthened if it doesn't check a
+                              specific value or state -- this runs on
+                              every request, no execution needed.
 6. Report, then offer      -> list what was written and what each test
-                              covers. Nothing is run. Offer to run and
-                              verify -- do not do it unless asked.
-7. Only if asked           -> run the tests, run the mandatory
-                              fault-injection check on business-logic
-                              tests, report honestly what's covered.
+                              covers, plus anything strengthened in the
+                              Step 5 self-review. Nothing is run. Offer to
+                              run and verify -- do not do it unless asked.
+7. Only if asked           -> run each new test at least twice to catch
+                              non-determinism empirically, run the
+                              mandatory fault-injection check on
+                              business-logic tests, report honestly
+                              what's covered.
 ```
 
 Step 6 is where most requests end, and that's by design. See
-[What this does (and doesn't do)](#what-this-does-and-doesnt-do).
+[What this does (and doesn't do)](#what-this-does-and-doesnt-do). Steps 4,
+5, and 7's extra rigor (batching, the assertion self-review, and the
+repeated verification run) were added in a dedicated quality-hardening
+pass -- see [Version history](#version-history).
 
 ## The fault-injection self-check
 
@@ -237,7 +254,8 @@ that a call didn't throw.
 src/services/shipping.js, it's pure logic."*
 
 ```js
-// src/services/shipping.test.js (written)
+// src/services/shipping.test.js -- Tests for calculateShippingCost:
+// standard/expedited pricing, boundary and error paths.
 import { describe, it, expect } from 'vitest';
 import { calculateShippingCost } from './shipping.js';
 
@@ -276,15 +294,53 @@ same tests, confirms they go red, then restores the file to its original
 state. That's the proof the suite would actually catch a regression, not
 just that it runs.
 
+## Works beyond Claude Code
+
+The `SKILL.md` folder convention Claude Code popularized is no longer
+Claude-only. Codex CLI, Cursor, and opencode now read the same
+`SKILL.md` + `reference/` + `scripts/` shape natively, just from
+different discovery paths. Every skill here was already written in
+generic imperative instructions with no Claude-specific identity
+language, so the same content works elsewhere too, once it's in a path
+that tool looks at:
+
+| Tool | How to get it | Auto-triggers? |
+|---|---|---|
+| Claude Code | `/plugin install testing-suite@test-kit-marketplace` (see [Installation](#installation)) | Yes |
+| Codex CLI, opencode | Already vendored at [`.agents/skills/`](.agents/skills) in this repo -- copy that directory into your own project's root | Yes |
+| Cursor | Copy [`.agents/skills/`](.agents/skills)'s contents into `.cursor/skills/` instead | Yes |
+| Aider, Windsurf, Zed, Gemini CLI, Amp (no skills system) | Copy [`.agents/skills/`](.agents/skills) into your project, then append [`plugins/testing-suite/portable/AGENTS.md`](plugins/testing-suite/portable/AGENTS.md) to your project's own `AGENTS.md` (or `CONVENTIONS.md` for Aider) | No -- static, always-loaded |
+
+`plugins/testing-suite/scripts/sync-portable-skills.sh` keeps the
+`.agents/skills/` copies byte-identical to the canonical
+`plugins/testing-suite/skills/` folders; it's re-run every time a skill
+changes.
+
+One honest caveat: this was verified by content review and each tool's
+own published docs on the shared `SKILL.md` convention, not by an actual
+end-to-end run inside Codex, Cursor, or opencode themselves -- do a live
+check in whichever one you use before relying on it for anything
+critical.
+
 ## Repository layout
 
 ```
 .claude-plugin/
   marketplace.json              # this marketplace's catalog
+.agents/
+  skills/                       # vendored copies for Codex/opencode/etc,
+                                 # kept in sync with plugins/testing-suite/skills/
+                                 # by sync-portable-skills.sh -- see
+                                 # "Works beyond Claude Code" above
 plugins/
   testing-suite/
     .claude-plugin/
-      plugin.json                # plugin manifest (v2.0.0)
+      plugin.json                # plugin manifest (v2.4.0)
+    portable/
+      AGENTS.md                  # condensed fragment for tools with no
+                                  # skills system (Aider, Windsurf, etc.)
+    scripts/
+      sync-portable-skills.sh    # repo-maintenance: syncs .agents/skills/
     skills/
       flutter-testing/
         SKILL.md
@@ -295,6 +351,7 @@ plugins/
         evals/evals.json
       react-testing/               # same shape
       nextjs-testing/              # same shape
+      react-native-testing/        # same shape
       swift-testing/               # same shape
       node-testing/                # same shape
     README.md
@@ -364,13 +421,62 @@ low-freedom procedures for fragile steps) come from two dedicated
 research passes. One covers testing methodology and AI-agent
 test-generation failure modes across Flutter, React, Next.js, Swift, and
 Node. The other covers Claude Skill/plugin authoring and hosting
-mechanics straight from Anthropic's own documentation. The specific
-findings cited above trace to a controlled AST-based agent-vs-human
-test-quality study and a 2026 SmartBear software-leader survey, both
-referenced in that research base.
+mechanics straight from Anthropic's own documentation. `react-native-testing`
+was grounded in a separate, later research pass against Expo's,
+expo-router's, and Maestro's own documentation, since it was added after
+those two initial reports. The specific findings cited above trace to a
+controlled AST-based agent-vs-human test-quality study and a 2026
+SmartBear software-leader survey, both referenced in that research base.
+
+Guidance isn't just written once and left to go stale: a later,
+dedicated currency-audit pass re-checked every platform's tooling and
+code syntax against each ecosystem's own current documentation, and
+corrected what had genuinely drifted (see the 2.3.0 entry in
+[Version history](#version-history)) while leaving what was still
+accurate untouched, rather than assuming everything needed a rewrite.
 
 ## Version history
 
+- **2.4.0**: Tightened the comment policy across all six skills. A
+  generated test file now gets exactly one header comment stating what
+  the file covers, plus an inline comment only when the reason for a
+  specific setup value or edge case genuinely isn't obvious from the
+  test name and code itself -- no narrating what a line does. This
+  replaces the previous "minimal comments, roughly one per test"
+  guidance with a stricter, file-scoped default.
+- **2.3.0**: Currency audit. Three parallel research passes checked every
+  platform's guidance against current (Aug 2026) documented behavior.
+  Headline fix: Next.js has required `params`/`searchParams` to be
+  awaited as Promises since v15 (Next.js is now at 16.3), and the
+  `nextjs-testing` reference docs still showed the old synchronous
+  shape -- fixed. Also: Flutter's golden-test guidance now recommends
+  Alchemist (`golden_toolkit`, which it supersedes, is confirmed
+  discontinued), Riverpod's `ProviderContainer.test()` is the new default
+  pattern, Swift's `#expect(throws:)` example now uses the
+  return-value form, React Native's RNTL v14+ async `render`/`fireEvent`
+  API is reflected, and Node's contract-testing guidance swaps the
+  stalled Dredd for Schemathesis. Everything else in all six skills was
+  confirmed still accurate as-is -- this was a targeted correction pass,
+  not a rewrite.
+- **2.2.0**: Quality and portability pass. Every skill now does a free
+  assertion-strength self-review before reporting (Step 5), runs new
+  tests at least twice before considering them green when verification
+  is requested (Step 7), and proposes a batched plan for large-scope
+  requests instead of attempting everything at once (Step 4). Each
+  `reference/verification.md` now points to a real mutation-testing tool
+  for projects that want more rigor than the built-in fault-injection
+  check. Also added cross-CLI portability: the skill folders are vendored
+  at `.agents/skills/` for tools that read that path directly (Codex CLI,
+  opencode), plus a condensed `portable/AGENTS.md` fragment for tools with
+  no skills system at all. See [Works beyond Claude Code](#works-beyond-claude-code).
+- **2.1.0**: Added `react-native-testing`, a sixth skill covering Expo
+  (managed and bare) and plain React Native CLI in one skill, branching on
+  whichever workflow is detected. Jest (`jest-expo` or the `react-native`
+  preset) with React Native Testing Library for unit/component tests,
+  `expo-router/testing-library` for route-level tests, and Maestro (default)
+  or Detox for E2E, all with the same opt-in verification model as every
+  other skill. `react-testing` now explicitly declines React Native
+  projects and points to it.
 - **2.0.0**: Test execution and the fault-injection self-check became
   opt-in instead of automatic. Writing correct test files is each skill's
   deliverable on its own; running and verifying them now happens only on

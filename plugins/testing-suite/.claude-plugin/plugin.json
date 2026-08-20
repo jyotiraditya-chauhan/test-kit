@@ -1,7 +1,7 @@
 {
   "name": "testing-suite",
-  "description": "Stack-aware test writing for Flutter, React, Next.js, Swift/SwiftUI, and Node/Express. Detects the project's existing conventions, elicits scope from the user, and writes AAA-structured tests with boundary-only mocking -- the written test files are the deliverable. Running and verifying them (including a fault-injection self-check) is available on request, not automatic.",
-  "version": "2.0.0",
+  "description": "Stack-aware test writing for Flutter, React, Next.js, React Native/Expo, Swift/SwiftUI, and Node/Express. Detects the project's existing conventions, elicits scope from the user, and writes AAA-structured tests with boundary-only mocking -- the written test files are the deliverable. Running and verifying them (including a fault-injection self-check) is available on request, not automatic.",
+  "version": "2.4.0",
   "author": {
     "name": "jyotiraditya-chauhan",
     "email": "adityachauhan0369@gmail.com"

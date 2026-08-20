@@ -1,0 +1,111 @@
+{
+  "evals": [
+    {
+      "skills": ["swift-testing"],
+      "query": "Write tests for LoginViewModel, it validates email and password",
+      "files": [
+        {
+          "path": "FakeApp.xcodeproj/project.pbxproj",
+          "content": "// placeholder Xcode project file"
+        },
+        {
+          "path": "FakeApp/LoginViewModel.swift",
+          "content": "import SwiftUI\n\n@Observable\nfinal class LoginViewModel {\n    var email = \"\"\n    var password = \"\"\n    var errorMessage: String?\n\n    func submit() {\n        guard email.contains(\"@\") else {\n            errorMessage = \"Enter a valid email\"\n            return\n        }\n        guard password.count >= 8 else {\n            errorMessage = \"Password must be at least 8 characters\"\n            return\n        }\n        errorMessage = nil\n    }\n}\n"
+        }
+      ],
+      "expected_behavior": [
+        "Runs scripts/detect_stack.sh or otherwise confirms this is a Swift project and checks whether Swift Testing or XCTest already dominates the test target",
+        "Tests LoginViewModel directly (the view model) rather than attempting to introspect a SwiftUI view's private tree",
+        "Uses @Test and #expect (Swift Testing), not XCTestCase/XCTAssert, if no existing XCTest convention is found",
+        "Flags authentication as a critical path requiring elevated rigor even though the user's request was general",
+        "Covers invalid-email, short-password, and valid-input cases as separate test cases",
+        "Does NOT automatically run the fault-injection self-check from reference/verification.md -- the request only asked to write the tests, not to run or verify them",
+        "Reports the file written and what each test covers, then offers to run and verify (including the fault-injection check on this critical-path test) rather than executing anything unprompted"
+      ]
+    },
+    {
+      "skills": ["swift-testing"],
+      "query": "Write tests for LoginViewModel and run them so I know they actually catch bugs",
+      "files": [
+        {
+          "path": "FakeApp.xcodeproj/project.pbxproj",
+          "content": "// placeholder Xcode project file"
+        },
+        {
+          "path": "FakeApp/LoginViewModel.swift",
+          "content": "import SwiftUI\n\n@Observable\nfinal class LoginViewModel {\n    var email = \"\"\n    var password = \"\"\n    var errorMessage: String?\n\n    func submit() {\n        guard email.contains(\"@\") else {\n            errorMessage = \"Enter a valid email\"\n            return\n        }\n        guard password.count >= 8 else {\n            errorMessage = \"Password must be at least 8 characters\"\n            return\n        }\n        errorMessage = nil\n    }\n}\n"
+        }
+      ],
+      "expected_behavior": [
+        "Recognizes 'run them so I know they actually catch bugs' as an explicit request for verification and proceeds through Step 7",
+        "Actually runs the generated tests and confirms they pass",
+        "Runs the mandatory fault-injection self-check from reference/verification.md on this critical-path (authentication) test, confirms it goes red on a deliberate fault, then reverts the fault to its exact original state",
+        "Reports back what was covered and confirms the fault-injection check passed"
+      ]
+    },
+    {
+      "skills": ["swift-testing"],
+      "query": "Add a snapshot test for the ProductCard SwiftUI view",
+      "files": [
+        {
+          "path": "Package.swift",
+          "content": "// swift-tools-version:5.10\nimport PackageDescription\nlet package = Package(name: \"FakeApp\", dependencies: [\n  .package(url: \"https://github.com/pointfreeco/swift-snapshot-testing\", from: \"1.15.0\")\n])\n"
+        },
+        {
+          "path": "Sources/FakeApp/ProductCard.swift",
+          "content": "import SwiftUI\n\nstruct ProductCard: View {\n    let title: String\n    let price: String\n    var body: some View {\n        VStack { Text(title); Text(price) }\n    }\n}\n"
+        }
+      ],
+      "expected_behavior": [
+        "Detects swift-snapshot-testing is already declared in Package.swift and uses it rather than proposing ViewInspector or a different library",
+        "Wraps the SwiftUI view in UIHostingController per reference/snapshot-and-persistence.md",
+        "Scopes the snapshot to the ProductCard component itself, not a full screen",
+        "Notes font/simulator-version flakiness causes and how to pin them",
+        "Does not force the mandatory fault-injection self-check onto a pure visual snapshot test, and says so explicitly in the final report"
+      ]
+    },
+    {
+      "skills": ["swift-testing"],
+      "query": "We already have XCTest tests for everything else in this codebase. Write a test for OrderService.calculateTotal.",
+      "files": [
+        {
+          "path": "FakeApp.xcodeproj/project.pbxproj",
+          "content": "// placeholder"
+        },
+        {
+          "path": "FakeAppTests/ExistingTests.swift",
+          "content": "import XCTest\n@testable import FakeApp\n\nclass ExistingTests: XCTestCase {\n    func testSomething() { XCTAssertTrue(true) }\n}\n"
+        },
+        {
+          "path": "FakeApp/OrderService.swift",
+          "content": "struct OrderService {\n    func calculateTotal(prices: [Double], discountPercent: Double = 0) -> Double {\n        guard !prices.isEmpty else { return 0 }\n        let subtotal = prices.reduce(0, +)\n        return subtotal * (1 - discountPercent / 100)\n    }\n}\n"
+        }
+      ],
+      "expected_behavior": [
+        "Detects that XCTest already dominates the test target via scripts/detect_stack.sh and matches it -- generates XCTestCase/XCTAssert-style tests, not @Test/#expect, even though Swift Testing is this skill's default recommendation",
+        "Covers a happy-path case, an empty-array boundary case, and a discount edge case",
+        "Does not automatically run the fault-injection self-check -- offers verification rather than running it unprompted, since the request only asked for the test to be written",
+        "Does not introduce Swift Testing as a second, competing framework into a codebase that already consistently uses XCTest"
+      ]
+    },
+    {
+      "skills": ["swift-testing"],
+      "query": "Write tests for our on-device Foundation Models feature that summarizes user notes",
+      "files": [
+        {
+          "path": "FakeApp.xcodeproj/project.pbxproj",
+          "content": "// placeholder"
+        },
+        {
+          "path": "FakeApp/NoteSummarizer.swift",
+          "content": "// uses Apple's Foundation Models framework to summarize notes on-device\n"
+        }
+      ],
+      "expected_behavior": [
+        "Explicitly states that on-device Foundation Models testing conventions are a known, under-researched gap for this skill rather than inventing confident-sounding conventions",
+        "Does not fabricate specific Foundation-Models-testing APIs or mocking patterns not covered in the skill's reference material",
+        "Offers to proceed with general best-effort testing (e.g. mocking the model's response contract) while flagging the uncertainty, rather than silently guessing or refusing entirely"
+      ]
+    }
+  ]
+}

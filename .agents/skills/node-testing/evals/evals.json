@@ -1,0 +1,100 @@
+{
+  "evals": [
+    {
+      "skills": ["node-testing"],
+      "query": "Write tests for GET /api/users in src/app.js",
+      "files": [
+        {
+          "path": "package.json",
+          "content": "{\"name\":\"fake-api\",\"dependencies\":{\"express\":\"^4.19.0\"},\"devDependencies\":{\"vitest\":\"^2.0.0\",\"supertest\":\"^7.0.0\"}}"
+        },
+        {
+          "path": "src/app.js",
+          "content": "const express = require('express');\nconst app = express();\napp.get('/api/users', (req, res) => res.json([{ id: 1, name: 'Ada' }]));\nmodule.exports = { app };\n"
+        }
+      ],
+      "expected_behavior": [
+        "Runs scripts/detect_stack.sh or otherwise confirms Express + Supertest are already present",
+        "Asks the user a clarifying question covering both test layer and scope before generating tests",
+        "Uses supertest against the exported app instance directly (request(app).get(...)), never calling app.listen() in the test",
+        "States an explicit test plan before writing test code",
+        "Reports the file written and what each test covers, then offers to run and verify -- does NOT run the test or claim any pass/fail result unless asked"
+      ]
+    },
+    {
+      "skills": ["node-testing"],
+      "query": "Add tests for the calculateShippingCost function in src/services/shipping.js, it's pure logic",
+      "files": [
+        {
+          "path": "package.json",
+          "content": "{\"name\":\"fake-api\",\"dependencies\":{\"express\":\"^4.19.0\"},\"devDependencies\":{\"vitest\":\"^2.0.0\"}}"
+        },
+        {
+          "path": "src/services/shipping.js",
+          "content": "function calculateShippingCost(weightKg, expedited = false) {\n  if (weightKg <= 0) throw new Error('weight must be positive');\n  const base = weightKg * 2.5;\n  return expedited ? base * 1.5 : base;\n}\nmodule.exports = { calculateShippingCost };\n"
+        }
+      ],
+      "expected_behavior": [
+        "Classifies calculateShippingCost as pure business logic and generates a plain unit test with no Supertest/Express objects involved",
+        "Covers a happy-path case, the zero/negative-weight error-path case, and the expedited-vs-standard boundary case",
+        "Does NOT automatically run the test or the fault-injection self-check -- the request only asked to add tests",
+        "Offers, without executing anything, to run the tests and verify with a fault-injection check"
+      ]
+    },
+    {
+      "skills": ["node-testing"],
+      "query": "Add tests for calculateShippingCost in src/services/shipping.js and run them to verify they actually catch bugs",
+      "files": [
+        {
+          "path": "package.json",
+          "content": "{\"name\":\"fake-api\",\"dependencies\":{\"express\":\"^4.19.0\"},\"devDependencies\":{\"vitest\":\"^2.0.0\"}}"
+        },
+        {
+          "path": "src/services/shipping.js",
+          "content": "function calculateShippingCost(weightKg, expedited = false) {\n  if (weightKg <= 0) throw new Error('weight must be positive');\n  const base = weightKg * 2.5;\n  return expedited ? base * 1.5 : base;\n}\nmodule.exports = { calculateShippingCost };\n"
+        }
+      ],
+      "expected_behavior": [
+        "Recognizes 'run them to verify they actually catch bugs' as an explicit request for verification and proceeds through Step 7 without a separate confirmation round-trip",
+        "Actually runs the generated tests and confirms they pass against the real implementation",
+        "Runs the fault-injection self-check from reference/verification.md: introduces a deliberate fault, confirms the test goes red, then reverts it to its exact original state",
+        "Reports back explicitly what was covered and confirms the fault-injection check passed"
+      ]
+    },
+    {
+      "skills": ["node-testing"],
+      "query": "Test the POST /api/orders endpoint -- it writes to the database and needs an auth token",
+      "files": [
+        {
+          "path": "package.json",
+          "content": "{\"name\":\"fake-api\",\"dependencies\":{\"express\":\"^4.19.0\"},\"devDependencies\":{\"vitest\":\"^2.0.0\",\"supertest\":\"^7.0.0\",\"testcontainers\":\"^10.0.0\"}}"
+        },
+        {
+          "path": "src/routes/orders.js",
+          "content": "// POST /api/orders: requires Authorization header, validates body, writes an order row\n"
+        }
+      ],
+      "expected_behavior": [
+        "Flags this as a critical/data-write path requiring elevated rigor and high branch coverage even though the request was about one endpoint",
+        "Since testcontainers is already a dependency, considers a testcontainers-backed integration test for the real database write rather than mocking the database layer",
+        "Covers the missing-auth-token case (401), invalid-body case, and the successful-write happy path as separate cases",
+        "Ensures each test isolates its own database state (transaction rollback or fresh container) per reference/test-isolation.md",
+        "Does not automatically run the fault-injection self-check -- offers verification on this critical-path test rather than running it unprompted"
+      ]
+    },
+    {
+      "skills": ["node-testing"],
+      "query": "Write tests for my LoginButton React component",
+      "files": [
+        {
+          "path": "package.json",
+          "content": "{\"name\":\"fake-frontend\",\"dependencies\":{\"react\":\"^18.3.0\",\"react-dom\":\"^18.3.0\"}}"
+        }
+      ],
+      "expected_behavior": [
+        "Does NOT proceed as node-testing -- package.json declares no express/fastify/koa/@nestjs/core, so scripts/detect_stack.sh (or equivalent reasoning) errors out / declines",
+        "Clearly states this is a frontend React project and react-testing is the correct skill instead"
+      ]
+    }
+  ]
+}

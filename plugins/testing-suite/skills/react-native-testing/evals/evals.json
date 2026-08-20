@@ -1,0 +1,118 @@
+{
+  "evals": [
+    {
+      "skills": ["react-native-testing"],
+      "query": "Write tests for my LoginScreen component",
+      "files": [
+        {
+          "path": "package.json",
+          "content": "{\"name\":\"fake-expo-app\",\"dependencies\":{\"expo\":\"^51.0.0\",\"react\":\"18.2.0\",\"react-native\":\"0.74.0\"},\"devDependencies\":{\"jest-expo\":\"^51.0.0\",\"@testing-library/react-native\":\"^12.4.0\"},\"jest\":{\"preset\":\"jest-expo\"}}"
+        },
+        {
+          "path": "screens/LoginScreen.tsx",
+          "content": "export function LoginScreen() { /* renders email/password fields and a Log in button */ }\n"
+        }
+      ],
+      "expected_behavior": [
+        "Runs scripts/detect_stack.sh or otherwise confirms this is an Expo MANAGED project (expo present, no ios/android folders) and that jest-expo is already configured",
+        "Asks the user a clarifying question covering both test layer and scope before generating tests",
+        "Queries by accessible role/text (getByRole, getByPlaceholderText), not by testID as a first choice",
+        "States an explicit test plan before writing test code",
+        "Reports the file written and what each test covers, then offers to run and verify -- does NOT run the test or claim any pass/fail result unless asked"
+      ]
+    },
+    {
+      "skills": ["react-native-testing"],
+      "query": "Add tests for the CartBadge component, it reads from our Zustand cart store",
+      "files": [
+        {
+          "path": "package.json",
+          "content": "{\"name\":\"fake-rn-cli-app\",\"dependencies\":{\"react\":\"18.2.0\",\"react-native\":\"0.74.0\",\"zustand\":\"^4.5.0\"},\"devDependencies\":{\"jest\":\"^29.7.0\"},\"jest\":{\"preset\":\"react-native\"}}"
+        },
+        {
+          "path": "src/stores/cartStore.ts",
+          "content": "export const useCartStore = () => {};\n"
+        },
+        {
+          "path": "src/components/CartBadge.tsx",
+          "content": "export function CartBadge() { /* renders useCartStore().items.length */ }\n"
+        }
+      ],
+      "expected_behavior": [
+        "Identifies this as a plain React Native CLI project (no expo dependency) and uses the react-native Jest preset, not jest-expo",
+        "Identifies Zustand as the state-management library and exercises the real store, resetting state via useCartStore.setState(useCartStore.getInitialState()) rather than mocking the store",
+        "Does NOT automatically run the tests or the fault-injection self-check -- only asked to add tests"
+      ]
+    },
+    {
+      "skills": ["react-native-testing"],
+      "query": "Test my app/profile/[id].tsx route -- it should show a 'not found' state for an unknown id",
+      "files": [
+        {
+          "path": "package.json",
+          "content": "{\"name\":\"fake-expo-router-app\",\"dependencies\":{\"expo\":\"^51.0.0\",\"expo-router\":\"^3.5.0\",\"react\":\"18.2.0\",\"react-native\":\"0.74.0\"},\"devDependencies\":{\"jest-expo\":\"^51.0.0\",\"@testing-library/react-native\":\"^12.4.0\"},\"jest\":{\"preset\":\"jest-expo\"}}"
+        },
+        {
+          "path": "app/profile/[id].tsx",
+          "content": "export default function ProfileRoute() { /* reads id param, renders profile or not-found state */ }\n"
+        }
+      ],
+      "expected_behavior": [
+        "Detects expo-router is present and treats this as a route-level test, not a plain component render",
+        "Uses renderRouter from expo-router/testing-library with an initialUrl matching the route under test, per reference/expo-router-testing.md",
+        "Places the new test file in __tests__/ or a sibling directory, explicitly NOT inside app/ itself, since expo-router treats every file there as a route",
+        "Covers both the found-profile case and the not-found case as the user requested"
+      ]
+    },
+    {
+      "skills": ["react-native-testing"],
+      "query": "Add tests for the copyShareLink function and run them to verify they actually catch bugs",
+      "files": [
+        {
+          "path": "package.json",
+          "content": "{\"name\":\"fake-expo-app\",\"dependencies\":{\"expo\":\"^51.0.0\",\"expo-clipboard\":\"^6.0.0\",\"react\":\"18.2.0\",\"react-native\":\"0.74.0\"},\"devDependencies\":{\"jest-expo\":\"^51.0.0\",\"@testing-library/react-native\":\"^12.4.0\"},\"jest\":{\"preset\":\"jest-expo\"}}"
+        },
+        {
+          "path": "src/utils/share.ts",
+          "content": "import * as Clipboard from 'expo-clipboard';\nexport async function copyShareLink(link) { if (!link) throw new Error('link required'); await Clipboard.setStringAsync(link); }\n"
+        }
+      ],
+      "expected_behavior": [
+        "Recognizes 'run them to verify they actually catch bugs' as an explicit request for verification and proceeds through Step 7 without a separate confirmation round-trip",
+        "Mocks expo-clipboard at the module boundary and asserts the delegation (setStringAsync called with the right argument), per reference/native-module-mocking.md",
+        "Actually runs the generated tests and confirms they pass against the real implementation",
+        "Runs the fault-injection self-check from reference/verification.md: introduces a deliberate fault, confirms the test goes red, then reverts it to its exact original state"
+      ]
+    },
+    {
+      "skills": ["react-native-testing"],
+      "query": "Write an E2E test for the login flow",
+      "files": [
+        {
+          "path": "package.json",
+          "content": "{\"name\":\"fake-expo-app\",\"dependencies\":{\"expo\":\"^51.0.0\",\"react\":\"18.2.0\",\"react-native\":\"0.74.0\"},\"devDependencies\":{\"jest-expo\":\"^51.0.0\"}}"
+        }
+      ],
+      "expected_behavior": [
+        "Detects no existing E2E tooling (no detox devDependency, no .maestro directory) and defaults to recommending Maestro rather than Detox, per reference/e2e-maestro-and-detox.md",
+        "Explains Maestro requires no in-repo package installation, only a separate CLI install",
+        "Asks for the specific flow/scope (e.g. which screens/fields are involved in login) before generating the Maestro YAML flow",
+        "Does not silently install or configure Detox instead"
+      ]
+    },
+    {
+      "skills": ["react-native-testing"],
+      "query": "Write tests for my Dashboard component",
+      "files": [
+        {
+          "path": "package.json",
+          "content": "{\"name\":\"fake-web-app\",\"dependencies\":{\"react\":\"^18.3.0\",\"react-dom\":\"^18.3.0\"}}"
+        }
+      ],
+      "expected_behavior": [
+        "Does NOT proceed as react-native-testing -- package.json declares no react-native, so scripts/detect_stack.sh (or equivalent reasoning) errors out / declines",
+        "Clearly states this is a web React project and react-testing is the correct skill instead"
+      ]
+    }
+  ]
+}
