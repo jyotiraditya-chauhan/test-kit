@@ -12,7 +12,7 @@ tests.
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![Plugin](https://img.shields.io/badge/Claude%20Code-Plugin-5A45FF.svg)](https://code.claude.com/docs/en/plugins)
-[![Version](https://img.shields.io/badge/version-2.3.0-blue.svg)](plugins/testing-suite/.claude-plugin/plugin.json)
+[![Version](https://img.shields.io/badge/version-2.4.0-blue.svg)](plugins/testing-suite/.claude-plugin/plugin.json)
 [![Skills](https://img.shields.io/badge/skills-6-informational.svg)](#the-six-skills)
 
 ---
@@ -196,10 +196,12 @@ is the operational backbone documented in each `SKILL.md`:
                               For a large scope, proposes a batched plan
                               instead of attempting everything at once.
 5. Generate                -> AAA structure, boundary-only mocking,
-                              matches the project's existing style,
-                              minimal comments. Then a free self-review:
-                              every assertion just written gets re-read
-                              and strengthened if it doesn't check a
+                              matches the project's existing style. One
+                              header comment per file stating what it
+                              covers; inline comments only when genuinely
+                              necessary. Then a free self-review: every
+                              assertion just written gets re-read and
+                              strengthened if it doesn't check a
                               specific value or state -- this runs on
                               every request, no execution needed.
 6. Report, then offer      -> list what was written and what each test
@@ -252,7 +254,8 @@ that a call didn't throw.
 src/services/shipping.js, it's pure logic."*
 
 ```js
-// src/services/shipping.test.js (written)
+// src/services/shipping.test.js -- Tests for calculateShippingCost:
+// standard/expedited pricing, boundary and error paths.
 import { describe, it, expect } from 'vitest';
 import { calculateShippingCost } from './shipping.js';
 
@@ -332,7 +335,7 @@ critical.
 plugins/
   testing-suite/
     .claude-plugin/
-      plugin.json                # plugin manifest (v2.3.0)
+      plugin.json                # plugin manifest (v2.4.0)
     portable/
       AGENTS.md                  # condensed fragment for tools with no
                                   # skills system (Aider, Windsurf, etc.)
@@ -434,6 +437,13 @@ accurate untouched, rather than assuming everything needed a rewrite.
 
 ## Version history
 
+- **2.4.0**: Tightened the comment policy across all six skills. A
+  generated test file now gets exactly one header comment stating what
+  the file covers, plus an inline comment only when the reason for a
+  specific setup value or edge case genuinely isn't obvious from the
+  test name and code itself -- no narrating what a line does. This
+  replaces the previous "minimal comments, roughly one per test"
+  guidance with a stricter, file-scoped default.
 - **2.3.0**: Currency audit. Three parallel research passes checked every
   platform's guidance against current (Aug 2026) documented behavior.
   Headline fix: Next.js has required `params`/`searchParams` to be

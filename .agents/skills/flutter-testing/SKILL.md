@@ -135,10 +135,14 @@ silently truncating or silently attempting all of it in one shot.
   scope to design-system primitives, not full screens.
 - Integration tests: [reference/integration-testing.md](reference/integration-testing.md)
   — `integration_test` and, for native-OS interactions, Patrol.
-- Keep comments in generated test code minimal — at most one short comment
-  per test, only where the reason for a specific setup value or edge case
-  isn't obvious from the test name and code itself. Do not narrate what
-  each line does.
+- Comments are the exception, not the default. Start each generated file
+  with one short header comment stating what the file covers (e.g.
+  `// Tests for OrderService: pricing calculation, boundary and error
+  paths.`) — this is the only comment every file gets. Beyond that, add
+  an inline comment only when the reason for a specific setup value or
+  edge case genuinely isn't obvious from the test name and code itself,
+  never to narrate what a line does. Most files should end up with just
+  the header and zero or one inline comments total.
 - Before reporting anything, re-read every assertion you just wrote and
   flag or strengthen any that don't check a specific value or state — an
   `expect` that only confirms a widget/type exists without checking its

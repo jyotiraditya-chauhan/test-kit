@@ -115,10 +115,14 @@ silently truncating or silently attempting all of it in one shot.
 - View-model testing pattern: [reference/view-model-testing.md](reference/view-model-testing.md).
 - Snapshot tests and in-memory persistence: [reference/snapshot-and-persistence.md](reference/snapshot-and-persistence.md)
   — scope snapshots to small, stable components, not full screens.
-- Keep comments in generated test code minimal — at most one short comment
-  per test, only where the reason for a specific setup value or edge case
-  isn't obvious from the test name and code itself. Do not narrate what
-  each line does.
+- Comments are the exception, not the default. Start each generated file
+  with one short header comment stating what the file covers (e.g.
+  `// Tests for CartViewModel: total calculation, empty cart, checkout
+  error handling.`) — this is the only comment every file gets. Beyond
+  that, add an inline comment only when the reason for a specific setup
+  value or edge case genuinely isn't obvious from the test name and code
+  itself, never to narrate what a line does. Most files should end up
+  with just the header and zero or one inline comments total.
 - Before reporting anything, re-read every assertion you just wrote and
   flag or strengthen any that don't check a specific value or state — an
   `#expect` that only confirms something didn't throw without checking

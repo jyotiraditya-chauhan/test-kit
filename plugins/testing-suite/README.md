@@ -44,9 +44,11 @@ for example, refuses a project with `next` or `react-native` in
    large scope, proposes a batched plan and confirms the first batch
    rather than attempting everything in one pass.
 5. **Generate.** AAA-structured tests, boundary-only mocking or faking,
-   matching the project's existing style, with minimal comments. Then a
-   free self-review: every assertion just written gets re-read and
-   strengthened if it doesn't check a specific value or state -- this
+   matching the project's existing style. Comments are the exception, not
+   the default: one short header comment per file stating what it covers,
+   inline comments only when genuinely necessary. Then a free self-review:
+   every assertion just written gets re-read and strengthened if it
+   doesn't check a specific value or state -- this
    runs on every request, no execution required.
 6. **Report, then offer.** List what was written and what each test
    covers, plus anything strengthened in the Step 5 self-review. Nothing
