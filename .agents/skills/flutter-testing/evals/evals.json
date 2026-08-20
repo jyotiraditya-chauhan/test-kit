@@ -1,0 +1,130 @@
+{
+  "evals": [
+    {
+      "skills": ["flutter-testing"],
+      "query": "Write widget tests for the AppBackground widget",
+      "files": [
+        {
+          "path": "pubspec.yaml",
+          "content": "name: fake_app\ndependencies:\n  flutter:\n    sdk: flutter\n  flutter_riverpod: ^2.5.1\ndev_dependencies:\n  mocktail: ^1.0.0\n"
+        },
+        {
+          "path": "lib/widgets/app_background.dart",
+          "content": "import 'package:flutter/material.dart';\n\nclass AppBackground extends StatelessWidget {\n  final Widget child;\n  const AppBackground({super.key, required this.child});\n\n  @override\n  Widget build(BuildContext context) => Container(color: Colors.white, child: child);\n}\n"
+        }
+      ],
+      "expected_behavior": [
+        "Runs scripts/detect_stack.sh or otherwise reads pubspec.yaml to confirm Flutter and detect Riverpod before generating any test",
+        "Asks the user a clarifying question covering both test layer and scope (whole app / feature / this file) before generating tests, rather than assuming",
+        "States an explicit test plan before writing test code",
+        "Generated test uses WidgetTester.pumpWidget and find.byType/find.byKey rather than internal state inspection, per reference/widget-testing.md",
+        "Test file follows AAA structure",
+        "Reports the file written and what each test covers, then offers to run and verify the tests -- does NOT run flutter test or claim any pass/fail result unless the user asks for it"
+      ]
+    },
+    {
+      "skills": ["flutter-testing"],
+      "query": "Add unit tests for the OrderPricingService.calculateTotal method, it's pure business logic",
+      "files": [
+        {
+          "path": "pubspec.yaml",
+          "content": "name: fake_app\ndependencies:\n  flutter:\n    sdk: flutter\ndev_dependencies:\n  mocktail: ^1.0.0\n"
+        },
+        {
+          "path": "lib/services/order_pricing_service.dart",
+          "content": "class OrderPricingService {\n  double calculateTotal(List<double> itemPrices, {double discountPercent = 0}) {\n    if (itemPrices.isEmpty) return 0;\n    final subtotal = itemPrices.reduce((a, b) => a + b);\n    return subtotal * (1 - discountPercent / 100);\n  }\n}\n"
+        }
+      ],
+      "expected_behavior": [
+        "Classifies OrderPricingService as pure business logic, not UI, and generates a plain Dart unit test with no widget tree involved, per reference/unit-testing.md",
+        "Covers a happy-path case, an empty-list boundary case, and a discount edge case",
+        "Does not introduce mocking for a class with no external dependencies -- mocktail is present in the project but should not be used here since there's nothing to mock",
+        "Does NOT automatically run the test or the fault-injection self-check -- the query only asked to add tests, not to run or verify them",
+        "Offers, without executing anything, to run the tests and verify the business-logic test with a fault-injection check"
+      ]
+    },
+    {
+      "skills": ["flutter-testing"],
+      "query": "Write unit tests for OrderPricingService.calculateTotal and actually run them to make sure they work",
+      "files": [
+        {
+          "path": "pubspec.yaml",
+          "content": "name: fake_app\ndependencies:\n  flutter:\n    sdk: flutter\ndev_dependencies:\n  mocktail: ^1.0.0\n"
+        },
+        {
+          "path": "lib/services/order_pricing_service.dart",
+          "content": "class OrderPricingService {\n  double calculateTotal(List<double> itemPrices, {double discountPercent = 0}) {\n    if (itemPrices.isEmpty) return 0;\n    final subtotal = itemPrices.reduce((a, b) => a + b);\n    return subtotal * (1 - discountPercent / 100);\n  }\n}\n"
+        }
+      ],
+      "expected_behavior": [
+        "Since the user explicitly asked to run and verify the tests in the same request, proceeds through Step 7 without a separate confirmation round-trip",
+        "Actually runs the generated tests against the real implementation and confirms they pass",
+        "Runs the mandatory fault-injection self-check from reference/verification.md on this business-logic test: introduces a deliberate fault (e.g. flips the discount formula), confirms the test goes red, then reverts the fault to its exact original state",
+        "Reports back explicitly what was covered and confirms the fault-injection check passed, per the Step 7 reporting standard"
+      ]
+    },
+    {
+      "skills": ["flutter-testing"],
+      "query": "We use BLoC for auth. Write tests for AuthBloc covering login success and failure.",
+      "files": [
+        {
+          "path": "pubspec.yaml",
+          "content": "name: fake_app\ndependencies:\n  flutter:\n    sdk: flutter\n  flutter_bloc: ^8.1.5\ndev_dependencies:\n  bloc_test: ^9.1.7\n  mocktail: ^1.0.0\n"
+        },
+        {
+          "path": "lib/blocs/auth_bloc.dart",
+          "content": "// AuthBloc with LoginRequested event, emits AuthLoading, AuthSuccess, AuthFailure\n"
+        }
+      ],
+      "expected_behavior": [
+        "Detects flutter_bloc + bloc_test in pubspec.yaml and uses the blocTest<AuthBloc, AuthState> harness, not a Riverpod ProviderContainer pattern",
+        "Flags authentication as a critical path requiring elevated rigor even though the user only asked for login success/failure",
+        "Asks about scope (this bloc only vs the whole auth feature) before generating",
+        "Mocks only the repository/service dependency injected into AuthBloc, not the bloc itself",
+        "Includes both the emitted-state-sequence success case and an explicit failure/error case",
+        "Does not automatically run the fault-injection self-check -- the request only asked for the tests to be written; offers verification instead of running it unprompted"
+      ]
+    },
+    {
+      "skills": ["flutter-testing"],
+      "query": "Generate a golden test for the ProductCard widget",
+      "files": [
+        {
+          "path": "pubspec.yaml",
+          "content": "name: fake_app\ndependencies:\n  flutter:\n    sdk: flutter\ndev_dependencies:\n  golden_toolkit: ^0.15.0\n"
+        },
+        {
+          "path": "lib/widgets/product_card.dart",
+          "content": "// ProductCard: a small, stable design-system component\n"
+        }
+      ],
+      "expected_behavior": [
+        "Reads reference/golden-tests.md before generating the test",
+        "Scopes the golden test to the ProductCard component itself, not a full screen",
+        "Addresses font/device-pixel-ratio flakiness explicitly (bundles fonts or pins DPR) per reference/golden-tests.md",
+        "Does not run flutter test or the fault-injection self-check automatically; if verification is offered, correctly notes that fault-injection is optional for a pure visual-rendering golden test even within a verification pass"
+      ]
+    },
+    {
+      "skills": ["flutter-testing"],
+      "query": "Write an integration test for the checkout flow -- user adds an item, goes to checkout, and confirms payment",
+      "files": [
+        {
+          "path": "pubspec.yaml",
+          "content": "name: fake_app\ndependencies:\n  flutter:\n    sdk: flutter\n  integration_test:\n    sdk: flutter\ndev_dependencies:\n  mocktail: ^1.0.0\n"
+        },
+        {
+          "path": "lib/main.dart",
+          "content": "// app entrypoint with routes for /cart, /checkout, /payment-confirmation\n"
+        }
+      ],
+      "expected_behavior": [
+        "Reads reference/integration-testing.md before generating the test",
+        "Recognizes checkout/payment as a critical, revenue-impacting flow that genuinely warrants the integration_test layer rather than defaulting to a cheaper widget test",
+        "Uses IntegrationTestWidgetsFlutterBinding.ensureInitialized() and drives the real app entrypoint, per the integration_test pattern",
+        "Does not add the Patrol dependency unless the flow needs a native-OS-level interaction (permission dialog, biometric prompt, native payment sheet) that plain integration_test cannot reach -- and explains that reasoning if it comes up",
+        "Notes that this is the most expensive test layer and keeps the test scoped to the one critical flow rather than expanding into a large integration suite unasked"
+      ]
+    }
+  ]
+}
