@@ -92,6 +92,8 @@ claude plugin install testing-suite@test-kit-marketplace
 
 ## Usage
 
+### In Claude Code
+
 Just ask. The matching skill triggers automatically from your project's
 manifest files (`pubspec.yaml`, `package.json`, `.xcodeproj`, `next.config.*`,
 a `react-native` dependency):
@@ -116,6 +118,56 @@ Or invoke a skill directly, namespaced under the plugin:
 By default you'll get the test files and a summary of what each test
 covers. Add "and run them" or "and verify they work" to the same request
 if you also want them executed and fault-injection-checked.
+
+### Beyond Claude Code
+
+The `SKILL.md` folder convention Claude Code popularized is no longer
+Claude-only. Codex CLI, Cursor, and opencode now read the same
+`SKILL.md` + `reference/` + `scripts/` shape natively, just from
+different discovery paths. Every skill here was already written in
+generic imperative instructions with no Claude-specific identity
+language, so the same content works elsewhere too, once it's in a path
+that tool looks at:
+
+```bash
+# Codex CLI or opencode -- both read .agents/skills/ directly
+git clone --depth 1 https://github.com/jyotiraditya-chauhan/test-kit /tmp/test-kit
+cp -r /tmp/test-kit/.agents/skills/. .agents/skills/
+rm -rf /tmp/test-kit
+```
+
+```bash
+# Cursor -- same skills, its own discovery path
+git clone --depth 1 https://github.com/jyotiraditya-chauhan/test-kit /tmp/test-kit
+mkdir -p .cursor/skills
+cp -r /tmp/test-kit/.agents/skills/. .cursor/skills/
+rm -rf /tmp/test-kit
+```
+
+```bash
+# Aider, Windsurf, Zed, Gemini CLI, Amp -- no skills system, so also
+# append the condensed fragment to your project's own instructions file
+git clone --depth 1 https://github.com/jyotiraditya-chauhan/test-kit /tmp/test-kit
+cp -r /tmp/test-kit/.agents/skills/. .agents/skills/
+cat /tmp/test-kit/plugins/testing-suite/portable/AGENTS.md >> AGENTS.md
+rm -rf /tmp/test-kit
+```
+
+All three commands run once, from your own project's root. Once the
+files are in place, each tool's own skill discovery (or, for the last
+group, its always-loaded instructions file) picks them up automatically
+-- nothing further to configure.
+
+`plugins/testing-suite/scripts/sync-portable-skills.sh` keeps this
+repo's own `.agents/skills/` copy byte-identical to the canonical
+`plugins/testing-suite/skills/` folders you just cloned from; it's
+re-run here every time a skill changes.
+
+One honest caveat: this was verified by content review and each tool's
+own published docs on the shared `SKILL.md` convention, not by an actual
+end-to-end run inside Codex, Cursor, or opencode themselves -- do a live
+check in whichever one you use before relying on it for anything
+critical.
 
 ## The six skills
 
@@ -294,71 +346,6 @@ same tests, confirms they go red, then restores the file to its original
 state. That's the proof the suite would actually catch a regression, not
 just that it runs.
 
-## Works beyond Claude Code
-
-The `SKILL.md` folder convention Claude Code popularized is no longer
-Claude-only. Codex CLI, Cursor, and opencode now read the same
-`SKILL.md` + `reference/` + `scripts/` shape natively, just from
-different discovery paths. Every skill here was already written in
-generic imperative instructions with no Claude-specific identity
-language, so the same content works elsewhere too, once it's in a path
-that tool looks at:
-
-| Tool | How to get it | Auto-triggers? |
-|---|---|---|
-| Claude Code | `/plugin install testing-suite@test-kit-marketplace` (see [Installation](#installation)) | Yes |
-| Codex CLI, opencode | Already vendored at [`.agents/skills/`](.agents/skills) in this repo -- copy that directory into your own project's root | Yes |
-| Cursor | Copy [`.agents/skills/`](.agents/skills)'s contents into `.cursor/skills/` instead | Yes |
-| Aider, Windsurf, Zed, Gemini CLI, Amp (no skills system) | Copy [`.agents/skills/`](.agents/skills) into your project, then append [`plugins/testing-suite/portable/AGENTS.md`](plugins/testing-suite/portable/AGENTS.md) to your project's own `AGENTS.md` (or `CONVENTIONS.md` for Aider) | No -- static, always-loaded |
-
-`plugins/testing-suite/scripts/sync-portable-skills.sh` keeps the
-`.agents/skills/` copies byte-identical to the canonical
-`plugins/testing-suite/skills/` folders; it's re-run every time a skill
-changes.
-
-One honest caveat: this was verified by content review and each tool's
-own published docs on the shared `SKILL.md` convention, not by an actual
-end-to-end run inside Codex, Cursor, or opencode themselves -- do a live
-check in whichever one you use before relying on it for anything
-critical.
-
-## Repository layout
-
-```
-.claude-plugin/
-  marketplace.json              # this marketplace's catalog
-.agents/
-  skills/                       # vendored copies for Codex/opencode/etc,
-                                 # kept in sync with plugins/testing-suite/skills/
-                                 # by sync-portable-skills.sh -- see
-                                 # "Works beyond Claude Code" above
-plugins/
-  testing-suite/
-    .claude-plugin/
-      plugin.json                # plugin manifest (v2.4.0)
-    portable/
-      AGENTS.md                  # condensed fragment for tools with no
-                                  # skills system (Aider, Windsurf, etc.)
-    scripts/
-      sync-portable-skills.sh    # repo-maintenance: syncs .agents/skills/
-    skills/
-      flutter-testing/
-        SKILL.md
-        reference/                # unit, widget, golden, integration,
-                                   # state management, Firebase fakes,
-                                   # CI/distribution, fault-injection
-        scripts/                  # detect_stack.sh, scaffold_test_file.sh
-        evals/evals.json
-      react-testing/               # same shape
-      nextjs-testing/              # same shape
-      react-native-testing/        # same shape
-      swift-testing/               # same shape
-      node-testing/                # same shape
-    README.md
-README.md                          # this file
-LICENSE
-```
-
 ## Local development
 
 ```bash
@@ -435,6 +422,24 @@ corrected what had genuinely drifted (see the 2.3.0 entry in
 [Version history](#version-history)) while leaving what was still
 accurate untouched, rather than assuming everything needed a rewrite.
 
+## Contributing
+
+Contributions are welcome -- open an issue or a pull request at
+[github.com/jyotiraditya-chauhan/test-kit](https://github.com/jyotiraditya-chauhan/test-kit).
+A few things that would genuinely help:
+
+- **A platform this plugin doesn't cover yet** (a new skill following the
+  same seven-step structure and reference-doc layout as the existing six).
+- **Guidance that's drifted from a platform's own current docs** -- the
+  same kind of thing the currency-audit passes above catch, but between
+  audits, a report or a fix is welcome any time.
+- **A real check inside Codex CLI, Cursor, or opencode** -- the
+  [Beyond Claude Code](#beyond-claude-code) portability claim is verified
+  by content review and each tool's own documentation, not an actual
+  end-to-end run in any of them. Confirming (or correcting) that against
+  a live install is the single most useful thing anyone could verify
+  right now.
+
 ## Version history
 
 - **2.4.0**: Tightened the comment policy across all six skills. A
@@ -468,7 +473,7 @@ accurate untouched, rather than assuming everything needed a rewrite.
   check. Also added cross-CLI portability: the skill folders are vendored
   at `.agents/skills/` for tools that read that path directly (Codex CLI,
   opencode), plus a condensed `portable/AGENTS.md` fragment for tools with
-  no skills system at all. See [Works beyond Claude Code](#works-beyond-claude-code).
+  no skills system at all. See [Beyond Claude Code](#beyond-claude-code).
 - **2.1.0**: Added `react-native-testing`, a sixth skill covering Expo
   (managed and bare) and plain React Native CLI in one skill, branching on
   whichever workflow is detected. Jest (`jest-expo` or the `react-native`
