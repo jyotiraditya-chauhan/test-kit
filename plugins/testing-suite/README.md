@@ -1,6 +1,6 @@
 # testing-suite
 
-A Claude Code plugin that bundles five platform-specific test-writing
+A Claude Code plugin that bundles six platform-specific test-writing
 skills. Each skill detects the project's stack and existing test
 conventions, asks what to test before generating anything, and writes
 tests that follow the trophy/pyramid model appropriate to that platform.
@@ -13,8 +13,9 @@ automatic.
 | Skill | Namespaced as | Covers |
 |---|---|---|
 | `flutter-testing` | `/testing-suite:flutter-testing` | Flutter unit, widget, golden, and integration tests, each a first-class layer with its own reference doc. Detects BLoC/Riverpod/Provider/GetX from `pubspec.yaml` and selects the matching harness pattern. |
-| `react-testing` | `/testing-suite:react-testing` | Plain React (Vite/CRA, non-Next) unit and component/integration tests with Vitest/Jest, React Testing Library, and MSW for network-boundary mocking. |
+| `react-testing` | `/testing-suite:react-testing` | Plain React (Vite/CRA, non-Next, non-React-Native) unit and component/integration tests with Vitest/Jest, React Testing Library, and MSW for network-boundary mocking. |
 | `nextjs-testing` | `/testing-suite:nextjs-testing` | Next.js (App Router or Pages Router) tests, split between Vitest (Server Actions, schema validation, sync components) and Playwright (async Server Components, auth, checkout, the layer Vitest structurally cannot render). |
+| `react-native-testing` | `/testing-suite:react-native-testing` | React Native tests across Expo (managed or bare) and plain React Native CLI, one skill branching on the detected workflow. Jest (`jest-expo` or the `react-native` preset) with React Native Testing Library, `expo-router/testing-library` for route-level tests, and Maestro (default) or Detox for E2E flows. |
 | `swift-testing` | `/testing-suite:swift-testing` | Swift/SwiftUI unit, view-model, and snapshot tests. Defaults to Swift Testing (`@Test`/`#expect`), keeps XCTest where it already exists, and tests the view model directly since SwiftUI has no public view-tree introspection. |
 | `node-testing` | `/testing-suite:node-testing` | Node backend APIs (Express/Fastify/Koa/NestJS): unit tests for pure logic, Supertest-based HTTP integration tests against the app instance directly, and testcontainers-backed tests for real database behavior. |
 
@@ -22,7 +23,8 @@ Each skill's description leads with concrete trigger terms (framework
 names, manifest files, library names) specific to that platform. Each
 skill's `scripts/detect_stack.sh` also explicitly declines and points to
 the correct sibling skill when it detects the wrong stack. `react-testing`,
-for example, refuses a project with `next` in `package.json`.
+for example, refuses a project with `next` or `react-native` in
+`package.json`.
 
 ## What every skill does, in order
 

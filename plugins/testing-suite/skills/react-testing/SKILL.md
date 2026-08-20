@@ -1,6 +1,6 @@
 ---
 name: react-testing
-description: Generates unit, component, and integration tests for plain React projects (Vite, Create React App, or any non-Next.js React app) using Vitest or Jest with React Testing Library and MSW for network mocking. Use when the user asks to test a React component or hook, mentions .tsx/.jsx files, Vitest, Jest, React Testing Library, RTL, or MSW, in a project whose package.json has react and react-dom but not next. For Next.js projects (an app/ or pages/ directory, next.config.*), use nextjs-testing instead.
+description: Generates unit, component, and integration tests for plain React web projects (Vite, Create React App, or any non-Next.js React app) using Vitest or Jest with React Testing Library and MSW for network mocking. Use when the user asks to test a React component or hook, mentions .tsx/.jsx files, Vitest, Jest, React Testing Library, RTL, or MSW, in a project whose package.json has react and react-dom but not next or react-native. For Next.js projects (an app/ or pages/ directory, next.config.*), use nextjs-testing instead. For React Native/Expo projects, use react-native-testing instead.
 license: MIT
 compatibility: Requires Node.js and the project's existing package manager (npm/pnpm/yarn). Requires a package.json declaring react and react-dom without next.
 metadata:
@@ -41,10 +41,11 @@ Copy this into your response and check items off as you go:
 ## Step 1 — Detect stack
 
 Run `scripts/detect_stack.sh` from the project root. It confirms this is a
-plain React project (not Next.js — the script errors out and points to
-`nextjs-testing` if `next` is present), and reports the existing test
-runner (Vitest/Jest), RTL/user-event, MSW, Playwright/Cypress, and test file
-convention (co-located `*.test.tsx` vs `__tests__/`).
+plain React web project (not Next.js, not React Native — the script errors
+out and points to `nextjs-testing` if `next` is present, or
+`react-native-testing` if `react-native` is present), and reports the
+existing test runner (Vitest/Jest), RTL/user-event, MSW, Playwright/Cypress,
+and test file convention (co-located `*.test.tsx` vs `__tests__/`).
 
 If a test runner or mocking library is already in use, follow it even if a
 different tool is this skill's default recommendation. Never introduce a second,

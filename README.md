@@ -2,17 +2,18 @@
 
 **A Claude Code plugin marketplace for stack-aware test writing.**
 
-`test-kit` hosts **testing-suite**, one plugin bundling five platform skills:
-Flutter, React, Next.js, Swift/SwiftUI, and Node/Express. Each one detects a
-project's real stack and conventions, asks before assuming what to test, and
-writes tests that follow the project's own style. Flutter gets the deepest
-coverage of the five. Unit, widget, golden, and integration tests are each
-treated as first-class, not an afterthought behind widget tests.
+`test-kit` hosts **testing-suite**, one plugin bundling six platform skills:
+Flutter, React, Next.js, React Native/Expo, Swift/SwiftUI, and Node/Express.
+Each one detects a project's real stack and conventions, asks before assuming
+what to test, and writes tests that follow the project's own style. Flutter
+gets the deepest coverage of the six. Unit, widget, golden, and integration
+tests are each treated as first-class, not an afterthought behind widget
+tests.
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![Plugin](https://img.shields.io/badge/Claude%20Code-Plugin-5A45FF.svg)](https://code.claude.com/docs/en/plugins)
-[![Version](https://img.shields.io/badge/version-2.0.0-blue.svg)](plugins/testing-suite/.claude-plugin/plugin.json)
-[![Skills](https://img.shields.io/badge/skills-5-informational.svg)](#the-five-skills)
+[![Version](https://img.shields.io/badge/version-2.1.0-blue.svg)](plugins/testing-suite/.claude-plugin/plugin.json)
+[![Skills](https://img.shields.io/badge/skills-6-informational.svg)](#the-six-skills)
 
 ---
 
@@ -92,7 +93,8 @@ claude plugin install testing-suite@test-kit-marketplace
 ## Usage
 
 Just ask. The matching skill triggers automatically from your project's
-manifest files (`pubspec.yaml`, `package.json`, `.xcodeproj`, `next.config.*`):
+manifest files (`pubspec.yaml`, `package.json`, `.xcodeproj`, `next.config.*`,
+an `expo` dependency):
 
 ```
 Write widget tests for my LoginButton widget
@@ -106,6 +108,7 @@ Or invoke a skill directly, namespaced under the plugin:
 /testing-suite:flutter-testing
 /testing-suite:react-testing
 /testing-suite:nextjs-testing
+/testing-suite:react-native-testing
 /testing-suite:swift-testing
 /testing-suite:node-testing
 ```
@@ -114,13 +117,14 @@ By default you'll get the test files and a summary of what each test
 covers. Add "and run them" or "and verify they work" to the same request
 if you also want them executed and fault-injection-checked.
 
-## The five skills
+## The six skills
 
 | Skill | Command | Fires on | Default stack |
 |---|---|---|---|
 | **flutter-testing** | `/testing-suite:flutter-testing` | `pubspec.yaml` with a `flutter:` SDK dependency | `flutter_test`, `mocktail`, `bloc_test` / `ProviderContainer`, `golden_toolkit`, `integration_test` / Patrol |
-| **react-testing** | `/testing-suite:react-testing` | `package.json` with `react`+`react-dom`, no `next` | Vitest/Jest, React Testing Library, MSW |
+| **react-testing** | `/testing-suite:react-testing` | `package.json` with `react`+`react-dom`, no `next`, no `react-native` | Vitest/Jest, React Testing Library, MSW |
 | **nextjs-testing** | `/testing-suite:nextjs-testing` | `package.json` with `next` | Vitest (Server Actions, sync components) + Playwright (async Server Components, auth, checkout) |
+| **react-native-testing** | `/testing-suite:react-native-testing` | `package.json` with `react-native` (Expo managed, Expo bare, or plain RN CLI) | Jest (`jest-expo` or the `react-native` preset), React Native Testing Library, Maestro or Detox for E2E |
 | **swift-testing** | `/testing-suite:swift-testing` | `.xcodeproj` / `.xcworkspace` / `Package.swift` | Swift Testing (`@Test`/`#expect`), XCTest where it already exists, `swift-snapshot-testing` |
 | **node-testing** | `/testing-suite:node-testing` | `package.json` with `express`/`fastify`/`koa`/`@nestjs/core` | Supertest against the app instance, Vitest/Jest, testcontainers |
 
@@ -284,7 +288,7 @@ just that it runs.
 plugins/
   testing-suite/
     .claude-plugin/
-      plugin.json                # plugin manifest (v2.0.0)
+      plugin.json                # plugin manifest (v2.1.0)
     skills/
       flutter-testing/
         SKILL.md
@@ -295,6 +299,7 @@ plugins/
         evals/evals.json
       react-testing/               # same shape
       nextjs-testing/              # same shape
+      react-native-testing/        # same shape
       swift-testing/               # same shape
       node-testing/                # same shape
     README.md
@@ -364,13 +369,23 @@ low-freedom procedures for fragile steps) come from two dedicated
 research passes. One covers testing methodology and AI-agent
 test-generation failure modes across Flutter, React, Next.js, Swift, and
 Node. The other covers Claude Skill/plugin authoring and hosting
-mechanics straight from Anthropic's own documentation. The specific
-findings cited above trace to a controlled AST-based agent-vs-human
-test-quality study and a 2026 SmartBear software-leader survey, both
-referenced in that research base.
+mechanics straight from Anthropic's own documentation. `react-native-testing`
+was grounded in a separate, later research pass against Expo's,
+expo-router's, and Maestro's own documentation, since it was added after
+those two initial reports. The specific findings cited above trace to a
+controlled AST-based agent-vs-human test-quality study and a 2026
+SmartBear software-leader survey, both referenced in that research base.
 
 ## Version history
 
+- **2.1.0**: Added `react-native-testing`, a sixth skill covering Expo
+  (managed and bare) and plain React Native CLI in one skill, branching on
+  whichever workflow is detected. Jest (`jest-expo` or the `react-native`
+  preset) with React Native Testing Library for unit/component tests,
+  `expo-router/testing-library` for route-level tests, and Maestro (default)
+  or Detox for E2E, all with the same opt-in verification model as every
+  other skill. `react-testing` now explicitly declines React Native
+  projects and points to it.
 - **2.0.0**: Test execution and the fault-injection self-check became
   opt-in instead of automatic. Writing correct test files is each skill's
   deliverable on its own; running and verifying them now happens only on

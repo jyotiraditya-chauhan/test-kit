@@ -8,6 +8,11 @@ if [[ ! -f "package.json" ]]; then
   exit 1
 fi
 
+if grep -q '"react-native"' package.json; then
+  echo "ERROR: package.json declares 'react-native' as a dependency. This is a React Native project -- use the react-native-testing skill instead, not react-testing." >&2
+  exit 1
+fi
+
 if ! grep -q '"react"' package.json || ! grep -q '"react-dom"' package.json; then
   echo "ERROR: package.json does not declare both react and react-dom. This does not look like a React project." >&2
   exit 1

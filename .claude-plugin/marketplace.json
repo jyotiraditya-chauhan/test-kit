@@ -1,6 +1,6 @@
 {
   "name": "test-kit-marketplace",
-  "description": "A marketplace hosting the testing-suite plugin: stack-aware test generation skills for Flutter, React, Next.js, Swift/SwiftUI, and Node/Express.",
+  "description": "A marketplace hosting the testing-suite plugin: stack-aware test generation skills for Flutter, React, Next.js, React Native/Expo, Swift/SwiftUI, and Node/Express.",
   "owner": {
     "name": "jyotiraditya-chauhan",
     "email": "adityachauhan0369@gmail.com"
@@ -9,7 +9,7 @@
     {
       "name": "testing-suite",
       "source": "./plugins/testing-suite",
-      "description": "Five platform-specific skills (Flutter, React, Next.js, Swift, Node/Express) that detect a project's stack, audit its existing test conventions, and write unit/widget/integration/golden tests with boundary-only mocking. Running and verifying the tests -- including a fault-injection self-check -- is available on request."
+      "description": "Six platform-specific skills (Flutter, React, Next.js, React Native/Expo, Swift, Node/Express) that detect a project's stack, audit its existing test conventions, and write unit/widget/component/golden tests with boundary-only mocking. Running and verifying the tests -- including a fault-injection self-check -- is available on request."
     }
   ]
 }
