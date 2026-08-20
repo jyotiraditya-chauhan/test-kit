@@ -97,7 +97,7 @@ script (`scaffold_test_file.sh`) for mirroring `lib/` into `test/`. See
 the root README's [Flutter, in depth](../../README.md#flutter-in-depth)
 section for the full breakdown.
 
-## Works beyond Claude Code
+## Beyond Claude Code
 
 These skills use the same `SKILL.md` folder convention Codex CLI, Cursor,
 and opencode now read natively. They're vendored at `.agents/skills/` in
@@ -105,8 +105,8 @@ the repository root (kept in sync by `scripts/sync-portable-skills.sh`)
 for tools that read that path directly, plus a condensed
 `portable/AGENTS.md` fragment for tools with no skills system at all
 (Aider, Windsurf, Zed, Gemini CLI, Amp). See the root README's
-[Works beyond Claude Code](../../README.md#works-beyond-claude-code)
-section for the full compatibility table and setup steps.
+[Usage](../../README.md#usage) section, under "Beyond Claude Code," for
+copy-pasteable setup commands per tool.
 
 ## Kept current, not just written once
 
