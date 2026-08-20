@@ -94,7 +94,7 @@ claude plugin install testing-suite@test-kit-marketplace
 
 Just ask. The matching skill triggers automatically from your project's
 manifest files (`pubspec.yaml`, `package.json`, `.xcodeproj`, `next.config.*`,
-an `expo` dependency):
+a `react-native` dependency):
 
 ```
 Write widget tests for my LoginButton widget
@@ -191,22 +191,33 @@ is the operational backbone documented in each `SKILL.md`:
                               (unit/widget/integration/...), and which
                               scope (whole app, one feature, or specific
                               files). Never inferred silently.
-4. State the plan          -> what's in scope, what's mocked vs real, and
-                              the specific edge cases, before any code
-                              exists. The checkpoint to redirect.
+4. State the plan          -> what's in scope, what's mocked vs real, the
+                              specific edge cases, before any code exists.
+                              For a large scope, proposes a batched plan
+                              instead of attempting everything at once.
 5. Generate                -> AAA structure, boundary-only mocking,
                               matches the project's existing style,
-                              minimal comments.
+                              minimal comments. Then a free self-review:
+                              every assertion just written gets re-read
+                              and strengthened if it doesn't check a
+                              specific value or state -- this runs on
+                              every request, no execution needed.
 6. Report, then offer      -> list what was written and what each test
-                              covers. Nothing is run. Offer to run and
-                              verify -- do not do it unless asked.
-7. Only if asked           -> run the tests, run the mandatory
-                              fault-injection check on business-logic
-                              tests, report honestly what's covered.
+                              covers, plus anything strengthened in the
+                              Step 5 self-review. Nothing is run. Offer to
+                              run and verify -- do not do it unless asked.
+7. Only if asked           -> run each new test at least twice to catch
+                              non-determinism empirically, run the
+                              mandatory fault-injection check on
+                              business-logic tests, report honestly
+                              what's covered.
 ```
 
 Step 6 is where most requests end, and that's by design. See
-[What this does (and doesn't do)](#what-this-does-and-doesnt-do).
+[What this does (and doesn't do)](#what-this-does-and-doesnt-do). Steps 4,
+5, and 7's extra rigor (batching, the assertion self-review, and the
+repeated verification run) were added in a dedicated quality-hardening
+pass -- see [Version history](#version-history).
 
 ## The fault-injection self-check
 
@@ -413,6 +424,13 @@ expo-router's, and Maestro's own documentation, since it was added after
 those two initial reports. The specific findings cited above trace to a
 controlled AST-based agent-vs-human test-quality study and a 2026
 SmartBear software-leader survey, both referenced in that research base.
+
+Guidance isn't just written once and left to go stale: a later,
+dedicated currency-audit pass re-checked every platform's tooling and
+code syntax against each ecosystem's own current documentation, and
+corrected what had genuinely drifted (see the 2.3.0 entry in
+[Version history](#version-history)) while leaving what was still
+accurate untouched, rather than assuming everything needed a rewrite.
 
 ## Version history
 

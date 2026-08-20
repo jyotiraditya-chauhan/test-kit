@@ -40,18 +40,27 @@ for example, refuses a project with `next` or `react-native` in
    (unit/widget/integration/etc.) and the scope (whole app, one feature,
    or specific files) before generating anything. This is never assumed.
 4. **State the plan.** What's in scope, what's mocked vs real, and the
-   specific edge cases planned, before any test code is written.
+   specific edge cases planned, before any test code is written. For a
+   large scope, proposes a batched plan and confirms the first batch
+   rather than attempting everything in one pass.
 5. **Generate.** AAA-structured tests, boundary-only mocking or faking,
-   matching the project's existing style, with minimal comments.
+   matching the project's existing style, with minimal comments. Then a
+   free self-review: every assertion just written gets re-read and
+   strengthened if it doesn't check a specific value or state -- this
+   runs on every request, no execution required.
 6. **Report, then offer.** List what was written and what each test
-   covers. Nothing is run yet, and nothing is claimed to pass or fail.
-   Offer to run and verify, don't do it unprompted.
-7. **Only if asked, run and verify.** Run the new tests, then run the
-   mandatory fault-injection self-check on business-logic and
-   critical-path tests: deliberately break the implementation, confirm
-   the test goes red, revert the break, and report honestly what was
-   covered, what was left out, and whether any test was flagged and
-   rewritten. Never a blanket "fully tested" claim.
+   covers, plus anything strengthened in the Step 5 self-review. Nothing
+   is run yet, and nothing is claimed to pass or fail. Offer to run and
+   verify, don't do it unprompted.
+7. **Only if asked, run and verify.** Run each new test at least twice to
+   catch non-determinism empirically, then run the mandatory
+   fault-injection self-check on business-logic and critical-path tests:
+   deliberately break the implementation, confirm the test goes red,
+   revert the break, and report honestly what was covered, what was left
+   out, and whether any test was flagged and rewritten. Never a blanket
+   "fully tested" claim. `reference/verification.md` also points to a
+   real mutation-testing tool for projects that want more rigor than
+   this built-in check.
 
 ## Install
 
@@ -96,6 +105,15 @@ for tools that read that path directly, plus a condensed
 (Aider, Windsurf, Zed, Gemini CLI, Amp). See the root README's
 [Works beyond Claude Code](../../README.md#works-beyond-claude-code)
 section for the full compatibility table and setup steps.
+
+## Kept current, not just written once
+
+A dedicated currency-audit pass periodically re-checks every platform's
+tooling and code syntax against that ecosystem's own current
+documentation, and corrects real drift (a discontinued package, a
+changed API signature) while leaving what's still accurate untouched.
+See the root README's [Version history](../../README.md#version-history),
+2.3.0 entry, for the most recent pass and exactly what it changed.
 
 ## Why "ask, don't assume" and fault-injection matter
 
